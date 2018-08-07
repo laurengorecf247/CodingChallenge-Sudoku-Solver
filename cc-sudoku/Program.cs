@@ -71,6 +71,18 @@ namespace cc_sudoku
                 }
                 Console.WriteLine();
             }
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[i][j].MightBe.Count > 1)
+                    {
+                        {
+                            Console.WriteLine("Stuck on " + (i+1) + "," + (j+1) + " - could be " + string.Join(",", grid[i][j].MightBe));
+                        }
+                    }
+                }
+            }
             Console.ReadLine();
         }
 
