@@ -1,3 +1,4 @@
 
 cc-sudoku/bin/*
 cc-sudoku/obj/*
+.vs/cc-sudoku/*
