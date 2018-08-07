@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace cc_sudoku
 {
@@ -10,7 +11,7 @@ namespace cc_sudoku
         {
             bool chatty = false;
 
-            string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku1.csv");
+            string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku2.csv");
             Cell[][] grid = new Cell[9][];
             for (int i = 0; i < 9; i++)
             {
@@ -105,6 +106,74 @@ namespace cc_sudoku
                         RuleOutInColumn(i, j, (int)grid[i][j].Fixed, grid, chatty);
                         RuleOutInBox(i, j, (int)grid[i][j].Fixed, grid, chatty);
                         changed = true;
+                    }
+                }
+            }
+
+            for (int i = 0; i < 9; i++)
+            {
+                if (CheckRowForTwoSets(i, grid, chatty))
+                {
+                    changed = true;
+                }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                if (CheckColForTwoSets(i, grid, chatty))
+                {
+                    changed = true;
+                }
+            }
+
+            return changed;
+        }
+
+        static bool CheckRowForTwoSets(int row, Cell[][] grid, bool chatty)
+        {
+            var changed = false;
+
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[row][i].MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(grid[row][j].MightBe, grid[row][i].MightBe))
+                    {
+                        for (int k = 0; k < 9; k++)
+                        {
+                            if (k != i && k != j)
+                            {
+                                foreach (var digit in grid[row][i].MightBe)
+                                {
+                                    grid[row][k].MightBe.Remove(digit);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return changed;
+        }
+
+        static bool CheckColForTwoSets(int column, Cell[][] grid, bool chatty)
+        {
+            var changed = false;
+
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[i][column].MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(grid[j][column].MightBe, grid[i][column].MightBe))
+                    {
+                        for (int k = 0; k < 9; k++)
+                        {
+                            if (k != i && k != j)
+                            {
+                                foreach (var digit in grid[i][column].MightBe)
+                                {
+                                    grid[k][column].MightBe.Remove(digit);
+                                }
+                            }
+                        }
                     }
                 }
             }
