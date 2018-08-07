@@ -64,6 +64,7 @@ namespace cc_sudoku
                 iterated++;
             }
 
+            Console.WriteLine();
             Console.WriteLine("Solution = ");
             foreach (Cell[] line in grid)
             {
