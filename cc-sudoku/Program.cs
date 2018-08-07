@@ -125,7 +125,48 @@ namespace cc_sudoku
                     changed = true;
                 }
             }
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (CheckBoxForTwoSets(i, j, grid, chatty))
+                    {
+                        changed = true;
+                    }
+                }
+            }
 
+            return changed;
+        }
+
+        static bool CheckBoxForTwoSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        {
+            var changed = false;
+
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    var firstToCheck = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
+                    var secondToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
+
+
+                    if (firstToCheck.MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(secondToCheck.MightBe, firstToCheck.MightBe))
+                    {
+                        for (int k = 0; k < 9; k++)
+                        {
+                            var thirdToCheck = grid[boxRow * 3 + k % 3][boxCol * 3 + (int)Math.Floor(k / 3.0)];
+                            if (k != i && k != j)
+                            {
+                                foreach (var digit in firstToCheck.MightBe)
+                                {
+                                    thirdToCheck.MightBe.Remove(digit);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return changed;
         }
 
