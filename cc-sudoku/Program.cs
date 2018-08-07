@@ -25,6 +25,7 @@ namespace cc_sudoku
                     if (!string.IsNullOrWhiteSpace(digits[j]))
                     {
                         grid[i][j].Fixed = Int32.Parse(digits[j]);
+                        grid[i][j].MightBe = new List<int> { (int)grid[i][j].Fixed };
                     }
                 }
             }
