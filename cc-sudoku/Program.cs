@@ -163,7 +163,7 @@ namespace cc_sudoku
                             grid[row][i].MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In row " + row + ", " + option + " can only go in " + (row + 1) + "," + (i + 1));
+                                Console.WriteLine("In row " + (row + 1) + ", " + option + " can only go in " + (row + 1) + "," + (i + 1));
                             }
                         }
                     }
@@ -192,7 +192,7 @@ namespace cc_sudoku
                             grid[i][col].MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In column " + col + ", " + option + " can only go in " + (i + 1) + "," + (col + 1));
+                                Console.WriteLine("In column " + (col + 1) + ", " + option + " can only go in " + (i + 1) + "," + (col + 1));
                             }
                         }
                     }
@@ -431,7 +431,7 @@ namespace cc_sudoku
                     grid[row][i].MightBe.Remove(ruleOut);
                     if (grid[row][i].MightBe.Count == 0)
                     {
-                        throw new Exception("COL: Ruled out all options for " + row + "," + i);
+                        throw new Exception("COL: Ruled out all options for " + (row + 1) + "," + (i + 1));
                     }
                 }
             }
@@ -448,7 +448,7 @@ namespace cc_sudoku
                     grid[i][column].MightBe.Remove(ruleOut);
                     if (grid[i][column].MightBe.Count == 0)
                     {
-                        throw new Exception("ROW: Ruled out all options for " + i + "," + column);
+                        throw new Exception("ROW: Ruled out all options for " + (i + 1) + "," + (column + 1));
                     }
                 }
             }
@@ -472,7 +472,7 @@ namespace cc_sudoku
                         grid[usingRow][usingCol].MightBe.Remove(ruleOut);
                         if (grid[usingRow][usingCol].MightBe.Count == 0)
                         {
-                            throw new Exception("BOX: Ruled out all options for " + usingRow + "," + usingCol);
+                            throw new Exception("BOX: Ruled out all options for " + (usingRow + 1) + "," + (usingCol + 1));
                         }
                     }
                 }
