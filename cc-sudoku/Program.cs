@@ -140,12 +140,13 @@ namespace cc_sudoku
         static bool CheckForFixedCell(int i, int j)
         {
             var changed = false;
-            if (grid[i][j].MightBe.Count == 1 && !(grid[i][j].Fixed > 0))
+            var checkCell = grid[i][j];
+            if (checkCell.MightBe.Count == 1 && !(checkCell.Fixed > 0))
             {
-                grid[i][j].Fixed = grid[i][j].MightBe[0];
+                checkCell.Fixed = checkCell.MightBe[0];
                 if (chatty)
                 {
-                    Console.WriteLine(grid[i][j].X + "," + grid[i][j].Y + " is now " + grid[i][j].Fixed);
+                    Console.WriteLine(checkCell.X + "," + checkCell.Y + " is now " + checkCell.Fixed);
                 }
                 RuleOut(i, j);
                 changed = true;
