@@ -153,7 +153,6 @@ namespace cc_sudoku
                                     {
                                         Console.WriteLine((boxRow * 3 + k % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(k / 3.0) + 1) + " can't be " + digit + ": 2-subset in box");
                                     }
-                                    changed = true;
                                 }
                             }
                         }
@@ -181,7 +180,6 @@ namespace cc_sudoku
                                     {
                                         Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": 2-subset in row");
                                     }
-                                    changed = true;
                                 }
                             }
                         }
@@ -209,7 +207,6 @@ namespace cc_sudoku
                                     {
                                         Console.WriteLine((k + 1) + "," + (column + 1) + " can't be " + digit + ": 2-subset in column");
                                     }
-                                    changed = true;
                                 }
                             }
                         }
