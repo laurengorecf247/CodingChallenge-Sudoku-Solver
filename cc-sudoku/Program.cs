@@ -7,12 +7,12 @@ namespace cc_sudoku
 {
     class Program
     {
-        internal const bool chatty = false;
+        internal const bool chatty = true;
         internal static Cell[][] grid;
 
         static void Main(string[] args)
         {
-            string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku2.csv");
+            string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku5.csv");
             grid = new Cell[9][];
 
             for (int i = 0; i < 9; i++)
@@ -95,9 +95,9 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForOnlyOption(i);
-                CheckColForOnlyOption(i);
-                CheckBoxForOnlyOption(i);
+                CheckForOnlyOption(i, CheckType.Row);
+                CheckForOnlyOption(i, CheckType.Column);
+                CheckForOnlyOption(i, CheckType.Box);
             }
 
             for (int i = 0; i < 9; i++)
@@ -138,12 +138,28 @@ namespace cc_sudoku
             return changed;
         }
 
-        static void CheckRowForOnlyOption(int row)
+        static void CheckForOnlyOption(int checkNumber, CheckType checkType)
         {
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
             {
-                foreach (var option in grid[row][i].MightBe)
+                var checkCell = new Cell();
+                switch (checkType)
+                {
+                    case CheckType.Row:
+                        checkCell = grid[checkNumber][i];
+                        break;
+                    case CheckType.Column:
+                        checkCell = grid[i][checkNumber];
+                        break;
+                    case CheckType.Box:
+                        int boxRow = checkNumber % 3;
+                        int boxCol = (int)Math.Floor(checkNumber / 3.0);
+
+                        checkCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
+                        break;
+                }
+                foreach (var option in checkCell.MightBe)
                 {
                     options[(option - 1)]++;
                 }
@@ -154,73 +170,36 @@ namespace cc_sudoku
                 {
                     for (int i = 0; i < 9; i++)
                     {
-                        if (grid[row][i].MightBe.IndexOf(option) != -1 && !(grid[row][i].Fixed > 0))
+                        var setCell = new Cell();
+                        switch (checkType)
                         {
-                            grid[row][i].MightBe = new List<int> { option };
-                            if (chatty)
-                            {
-                                Console.WriteLine("In row " + (row + 1) + ", " + option + " can only go in " + (row + 1) + "," + (i + 1));
-                            }
+                            case CheckType.Row:
+                                setCell = grid[checkNumber][i];
+                                break;
+                            case CheckType.Column:
+                                setCell = grid[i][checkNumber];
+                                break;
+                            case CheckType.Box:
+                                setCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
+                                break;
                         }
-                    }
-                }
-            }
-        }
-
-        static void CheckColForOnlyOption(int col)
-        {
-            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            for (int i = 0; i < 9; i++)
-            {
-                foreach (var option in grid[i][col].MightBe)
-                {
-                    options[(option - 1)]++;
-                }
-            }
-            for (int option = 1; option < 10; option++)
-            {
-                if (options[(option - 1)] == 1)
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        if (grid[i][col].MightBe.IndexOf(option) != -1 && !(grid[i][col].Fixed > 0))
+                        if (setCell.MightBe.IndexOf(option) != -1 && !(setCell.Fixed > 0))
                         {
-                            grid[i][col].MightBe = new List<int> { option };
+                            setCell.MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In column " + (col + 1) + ", " + option + " can only go in " + (i + 1) + "," + (col + 1));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        static void CheckBoxForOnlyOption(int box)
-        {
-            int boxRow = box % 3;
-            int boxCol = (int)Math.Floor(box / 3.0);
-
-            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            for (int i = 0; i < 9; i++)
-            {
-                foreach (var option in grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe)
-                {
-                    options[(option - 1)]++;
-                }
-            }
-            for (int option = 1; option < 10; option++)
-            {
-                if (options[(option - 1)] == 1)
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        if (grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe.IndexOf(option) != -1 && !(grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].Fixed > 0))
-                        {
-                            grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe = new List<int> { option };
-                            if (chatty)
-                            {
-                                Console.WriteLine("In box " + (boxRow + 1) + "-" + (boxCol + 1) + ", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
+                                switch (checkType)
+                                {
+                                    case CheckType.Row:
+                                        Console.WriteLine("In row " + (checkNumber + 1) + ", " + option + " can only go in " + (checkNumber + 1) + "," + (i + 1));
+                                        break;
+                                    case CheckType.Column:
+                                        Console.WriteLine("In column " + (checkNumber + 1) + ", " + option + " can only go in " + (i + 1) + "," + (checkNumber + 1));
+                                        break;
+                                    case CheckType.Box:
+                                        Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", " + option + " can only go in " + ((checkNumber % 3) * 3 + i % 3 + 1) + "," + (((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0) + 1));
+                                        break;
+                                }
                             }
                         }
                     }
@@ -244,9 +223,6 @@ namespace cc_sudoku
                         basisCell = grid[i][checkNumber];
                         break;
                     case CheckType.Box:
-                        int boxRow = checkNumber % 3;
-                        int boxCol = (int)Math.Floor(checkNumber / 3.0);
-
                         basisCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
                         break;
                 }
