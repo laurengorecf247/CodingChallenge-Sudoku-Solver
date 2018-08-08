@@ -90,16 +90,16 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForSets(i);
-                CheckColForSets(i);
-                CheckBoxForSets(i % 3, (int)Math.Floor(i / 3.0));
+                CheckForSets(i, CheckType.Row);
+                CheckForSets(i, CheckType.Column);
+                CheckForSets(i, CheckType.Box);
             }
 
             for (int i = 0; i < 9; i++)
             {
                 CheckRowForOnlyOption(i);
                 CheckColForOnlyOption(i);
-                CheckBoxForOnlyOption(i % 3, (int)Math.Floor(i / 3.0));
+                CheckBoxForOnlyOption(i);
             }
 
             for (int i = 0; i < 9; i++)
@@ -200,8 +200,11 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForOnlyOption(int boxRow, int boxCol)
+        static void CheckBoxForOnlyOption(int box)
         {
+            int boxRow = box % 3;
+            int boxCol = (int)Math.Floor(box / 3.0);
+
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
             {
@@ -229,74 +232,29 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForSets(int boxRow, int boxCol)
+        static void CheckForSets(int checkNumber, CheckType checkType)
         {
             var setsChecked = new List<List<int>>();
 
             for (int i = 0; i < 9; i++)
             {
-                var basisCell = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
-                var set = basisCell.MightBe;
-
-                if (set.Count == 1)
+                var basisCell = new Cell();
+                switch (checkType)
                 {
-                    continue;
-                }
-                var redundant = false;
-                foreach (var setChecked in setsChecked)
-                {
-                    if (Enumerable.SequenceEqual(set, setChecked)) {
-                        redundant = true;
+                    case CheckType.Row:
+                        basisCell = grid[checkNumber][i];
                         break;
-                    }
+                    case CheckType.Column:
+                        basisCell = grid[i][checkNumber];
+                        break;
+                    case CheckType.Box:
+                        int boxRow = checkNumber % 3;
+                        int boxCol = (int)Math.Floor(checkNumber / 3.0);
+
+                        basisCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
+                        break;
                 }
-                if (redundant)
-                {
-                    continue;
-                }
-                setsChecked.Add(set);
 
-                var setsFound = new List<int> { i };
-
-                var removed = false;
-                for (int j = 0; j < 9; j++)
-                {
-                    var checkCell = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
-                    if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
-                    {
-                        setsFound.Add(j);
-                    }
-
-                    if (setsFound.Count == set.Count && set.Count > 1)
-                    {
-                        for (int k = 0; k < 9; k++)
-                        {
-                            if (!setsFound.Contains(k))
-                            {
-                                var removeCell = grid[boxRow * 3 + k % 3][boxCol * 3 + (int)Math.Floor(k / 3.0)];
-                                foreach (var digit in set)
-                                {
-                                    removeCell.MightBe.Remove(digit);
-                                    removed = true;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (removed && chatty)
-                {
-                    Console.WriteLine("In box " + (boxRow + 1) + "-" + (boxCol + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
-                }
-            }
-        }
-
-        static void CheckRowForSets(int row)
-        {
-            var setsChecked = new List<List<int>>();
-
-            for (int i = 0; i < 9; i++)
-            {
-                var basisCell = grid[row][i];
                 var set = basisCell.MightBe;
 
                 if (set.Count == 1)
@@ -323,7 +281,20 @@ namespace cc_sudoku
                 var removed = false;
                 for (int j = 0; j < 9; j++)
                 {
-                    var checkCell = grid[row][j];
+                    var checkCell = new Cell();
+                    switch (checkType)
+                    {
+                        case CheckType.Row:
+                            checkCell = grid[checkNumber][j];
+                            break;
+                        case CheckType.Column:
+                            checkCell = grid[j][checkNumber];
+                            break;
+                        case CheckType.Box:
+                            checkCell = grid[(checkNumber % 3) * 3 + j % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(j / 3.0)];
+                            break;
+                    }
+
                     if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
                     {
                         setsFound.Add(j);
@@ -336,7 +307,19 @@ namespace cc_sudoku
                     {
                         if (!setsFound.Contains(k))
                         {
-                            var removeCell = grid[row][k];
+                            var removeCell = new Cell();
+                            switch (checkType)
+                            {
+                                case CheckType.Row:
+                                    removeCell = grid[checkNumber][k];
+                                    break;
+                                case CheckType.Column:
+                                    removeCell = grid[k][checkNumber];
+                                    break;
+                                case CheckType.Box:
+                                    removeCell = grid[(checkNumber % 3) * 3 + k % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(k / 3.0)];
+                                    break;
+                            }
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
@@ -347,69 +330,18 @@ namespace cc_sudoku
                 }
                 if (removed && chatty)
                 {
-                    Console.WriteLine("In row " + (row + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
-                }
-            }
-        }
-
-        static void CheckColForSets(int col)
-        {
-            var setsChecked = new List<List<int>>();
-
-            for (int i = 0; i < 9; i++)
-            {
-                var basisCell = grid[i][col];
-                var set = grid[i][col].MightBe;
-
-                if (set.Count == 1)
-                {
-                    continue;
-                }
-                var redundant = false;
-                foreach (var setChecked in setsChecked)
-                {
-                    if (Enumerable.SequenceEqual(set, setChecked))
+                    switch (checkType)
                     {
-                        redundant = true;
-                        break;
+                        case CheckType.Row:
+                            Console.WriteLine("In row " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
+                            break;
+                        case CheckType.Column:
+                            Console.WriteLine("In column " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
+                            break;
+                        case CheckType.Box:
+                            Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
+                            break;
                     }
-                }
-                if (redundant)
-                {
-                    continue;
-                }
-                setsChecked.Add(set);
-
-                var setsFound = new List<int> { i };
-
-                var removed = false;
-                for (int j = 0; j < 9; j++)
-                {
-                    var checkCell = grid[j][col];
-                    if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
-                    {
-                        setsFound.Add(j);
-                    }
-                }
-
-                if (setsFound.Count == set.Count && set.Count > 1)
-                {
-                    for (int k = 0; k < 9; k++)
-                    {
-                        if (!setsFound.Contains(k))
-                        {
-                            var removeCell = grid[k][col];
-                            foreach (var digit in set)
-                            {
-                                removeCell.MightBe.Remove(digit);
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-                if (removed && chatty)
-                {
-                    Console.WriteLine("In column " + (col + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
         }
@@ -476,5 +408,12 @@ namespace cc_sudoku
         public int? Fixed { get; set; }
 
         public List<int> MightBe { get; set; }
+    }
+
+    enum CheckType
+    {
+        Row,
+        Column,
+        Box
     }
 }
