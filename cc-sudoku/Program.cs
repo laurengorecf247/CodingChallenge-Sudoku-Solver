@@ -42,9 +42,7 @@ namespace cc_sudoku
                 {
                     if (grid[i][j].Fixed > 0)
                     {
-                        RuleOutInRow(i, j);
-                        RuleOutInColumn(i, j);
-                        RuleOutInBox(i, j);
+                        RuleOut(i, j);
                     }
                 }
             }
@@ -134,9 +132,7 @@ namespace cc_sudoku
                 {
                     Console.WriteLine((i + 1) + "," + (j + 1) + " has only one option remaining, setting value to " + grid[i][j].Fixed);
                 }
-                RuleOutInRow(i, j);
-                RuleOutInColumn(i, j);
-                RuleOutInBox(i, j);
+                RuleOut(i, j);
                 changed = true;
             }
             return changed;
@@ -346,7 +342,7 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInColumn(int row, int column)
+        static void RuleOut(int row, int column)
         {
             var ruleOut = (int)grid[row][column].Fixed;
 
@@ -360,15 +356,7 @@ namespace cc_sudoku
                         throw new Exception("COL: Ruled out all options for " + (row + 1) + "," + (i + 1));
                     }
                 }
-            }
-        }
 
-        static void RuleOutInRow(int row, int column)
-        {
-            var ruleOut = (int)grid[row][column].Fixed;
-
-            for (int i = 0; i < 9; i++)
-            {
                 if (i != row)
                 {
                     grid[i][column].MightBe.Remove(ruleOut);
@@ -377,20 +365,9 @@ namespace cc_sudoku
                         throw new Exception("ROW: Ruled out all options for " + (i + 1) + "," + (column + 1));
                     }
                 }
-            }
-        }
 
-        static void RuleOutInBox(int row, int column)
-        {
-            var ruleOut = (int)grid[row][column].Fixed;
-
-            var boxRow = (int)Math.Floor(row / 3.0);
-            var boxCol = (int)Math.Floor(column / 3.0);
-
-            for (int i = 0; i < 9; i++)
-            {
-                var usingRow = 3 * boxRow + i % 3;
-                var usingCol = 3 * boxCol + (int)Math.Floor(i / 3.0);
+                var usingRow = (3 * (int)Math.Floor(row / 3.0)) + i % 3;
+                var usingCol = (3 * (int)Math.Floor(column / 3.0)) + (int)Math.Floor(i / 3.0);
                 if (usingRow != row || usingCol != column)
                 {
                     grid[usingRow][usingCol].MightBe.Remove(ruleOut);
