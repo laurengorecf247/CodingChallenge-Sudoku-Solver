@@ -98,6 +98,7 @@ namespace cc_sudoku
             {
                 for (int j = 0; j < 3; j++)
                 {
+                    CheckBoxForThreeSets(i, j);
                     CheckBoxForTwoSets(i, j);
                 }
             }
