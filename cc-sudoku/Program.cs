@@ -461,19 +461,16 @@ namespace cc_sudoku
             var boxRow = (int)Math.Floor(row / 3.0);
             var boxCol = (int)Math.Floor(column / 3.0);
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 9; i++)
             {
-                for (int j = 0; j < 3; j++)
+                var usingRow = 3 * boxRow + i % 3;
+                var usingCol = 3 * boxCol + (int)Math.Floor(i / 3.0);
+                if (usingRow != row || usingCol != column)
                 {
-                    var usingRow = 3 * boxRow + i;
-                    var usingCol = 3 * boxCol + j;
-                    if (usingRow != row || usingCol != column)
+                    grid[usingRow][usingCol].MightBe.Remove(ruleOut);
+                    if (grid[usingRow][usingCol].MightBe.Count == 0)
                     {
-                        grid[usingRow][usingCol].MightBe.Remove(ruleOut);
-                        if (grid[usingRow][usingCol].MightBe.Count == 0)
-                        {
-                            throw new Exception("BOX: Ruled out all options for " + (usingRow + 1) + "," + (usingCol + 1));
-                        }
+                        throw new Exception("BOX: Ruled out all options for " + (usingRow + 1) + "," + (usingCol + 1));
                     }
                 }
             }
