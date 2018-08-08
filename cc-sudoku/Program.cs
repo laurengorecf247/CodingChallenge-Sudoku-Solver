@@ -32,15 +32,7 @@ namespace cc_sudoku
             }
 
             Console.WriteLine("Problem = ");
-            foreach (Cell[] line in grid)
-            {
-                foreach (Cell digit in line)
-                {
-                    Console.Write((digit.Fixed > 0 ? digit.Fixed.ToString() : " ") + "|" );
-                }
-                Console.WriteLine();
-            }
-            Console.ReadLine();
+            WriteGrid(grid);
 
             for (int i = 0; i < 9; i++)
             {
@@ -55,25 +47,12 @@ namespace cc_sudoku
                 }
             }
 
-            bool changed = true;
-            int iterated = 1;
-            while (changed == true)
-            {
-                Console.WriteLine("Iteration: " + iterated);
-                changed = IterateThroughGrid(grid, chatty);
-                iterated++;
-            }
+            IterateThroughGrid(grid, chatty);
 
             Console.WriteLine();
             Console.WriteLine("Solution = ");
-            foreach (Cell[] line in grid)
-            {
-                foreach (Cell digit in line)
-                {
-                    Console.Write((digit.Fixed > 0 ? digit.Fixed.ToString() : " ") + "|");
-                }
-                Console.WriteLine();
-            }
+            WriteGrid(grid);
+
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -89,8 +68,21 @@ namespace cc_sudoku
             Console.ReadLine();
         }
 
-        static bool IterateThroughGrid(Cell[][] grid, bool chatty)
+        static void WriteGrid(Cell[][] grid)
         {
+            foreach (Cell[] line in grid)
+            {
+                foreach (Cell digit in line)
+                {
+                    Console.Write((digit.Fixed > 0 ? digit.Fixed.ToString() : " ") + "|");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        static void IterateThroughGrid(Cell[][] grid, bool chatty)
+        {
+            Console.WriteLine("Solving...");
             var changed = false;
             for (int i = 0; i < 9; i++)
             {
@@ -136,7 +128,10 @@ namespace cc_sudoku
                 }
             }
 
-            return changed;
+            if (changed)
+            {
+                IterateThroughGrid(grid, chatty);
+            }
         }
 
         static bool CheckBoxForTwoSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
