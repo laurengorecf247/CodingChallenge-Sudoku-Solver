@@ -92,27 +92,14 @@ namespace cc_sudoku
             {
                 CheckRowForSets(i);
                 CheckColForSets(i);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    CheckBoxForSets(i, j);
-                }
+                CheckBoxForSets(i % 3, (int)Math.Floor(i / 3.0));
             }
 
             for (int i = 0; i < 9; i++)
             {
                 CheckRowForOnlyOption(i);
                 CheckColForOnlyOption(i);
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    CheckBoxForOnlyOption(i, j);
-                }
+                CheckBoxForOnlyOption(i % 3, (int)Math.Floor(i / 3.0));
             }
 
             for (int i = 0; i < 9; i++)
