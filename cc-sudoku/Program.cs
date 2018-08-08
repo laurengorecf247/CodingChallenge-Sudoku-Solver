@@ -84,6 +84,21 @@ namespace cc_sudoku
         {
             Console.WriteLine("Solving...");
             var changed = false;
+
+            for (int i = 0; i < 9; i++)
+            {
+                CheckRowForOnlyOption(i, grid, chatty);
+                CheckColForOnlyOption(i, grid, chatty);
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    CheckBoxForOnlyOption(i, j, grid, chatty);
+                }
+            }
+
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -106,9 +121,6 @@ namespace cc_sudoku
             for (int i = 0; i < 9; i++)
             {
                 CheckRowForTwoSets(i, grid, chatty);
-            }
-            for (int i = 0; i < 9; i++)
-            {
                 CheckColForTwoSets(i, grid, chatty);
             }
             for (int i = 0; i < 3; i++)
@@ -127,6 +139,93 @@ namespace cc_sudoku
                 }
 
                 IterateThroughGrid(grid, chatty);
+            }
+        }
+
+        static void CheckRowForOnlyOption(int row, Cell[][] grid, bool chatty)
+        {
+            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            for (int i = 0; i < 9; i++)
+            {
+                foreach (var option in grid[row][i].MightBe)
+                {
+                    options[(option - 1)]++;
+                }
+            }
+            for (int option = 1; option < 10; option++)
+            {
+                if (options[(option - 1)] == 1)
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (grid[row][i].MightBe.IndexOf(option) != -1 && !(grid[row][i].Fixed > 0))
+                        {
+                            grid[row][i].MightBe = new List<int> { option };
+                            if (chatty)
+                            {
+                                Console.WriteLine("In row "+row+", "+option+" can only go in "+(row+1)+","+(i+1));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        static void CheckColForOnlyOption(int col, Cell[][] grid, bool chatty)
+        {
+            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            for (int i = 0; i < 9; i++)
+            {
+                foreach (var option in grid[i][col].MightBe)
+                {
+                    options[(option - 1)]++;
+                }
+            }
+            for (int option = 1; option < 10; option++)
+            {
+                if (options[(option - 1)] == 1)
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (grid[i][col].MightBe.IndexOf(option) != -1 && !(grid[i][col].Fixed > 0))
+                        {
+                            grid[i][col].MightBe = new List<int> { option };
+                            if (chatty)
+                            {
+                                Console.WriteLine("In column " + col + ", " + option + " can only go in " + (i + 1) + "," + (col + 1));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        static void CheckBoxForOnlyOption(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        {
+            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            for (int i = 0; i < 9; i++)
+            {
+                foreach (var option in grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe)
+                {
+                    options[(option - 1)]++;
+                }
+            }
+            for (int option = 1; option < 10; option++)
+            {
+                if (options[(option - 1)] == 1)
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe.IndexOf(option) != -1 && !(grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].Fixed > 0))
+                        {
+                            grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe = new List<int> { option };
+                            if (chatty)
+                            {
+                                Console.WriteLine("In box " + (boxRow+1) + "," + (boxCol+1) +", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
+                            }
+                        }
+                    }
+                }
             }
         }
 
