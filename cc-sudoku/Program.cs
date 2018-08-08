@@ -119,39 +119,14 @@ namespace cc_sudoku
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if (grid[i][j].MightBe.Count == 1 && !(grid[i][j].Fixed > 0))
+                    if (CheckCellForNewFixedValue(i, j))
                     {
-                        grid[i][j].Fixed = grid[i][j].MightBe[0];
-                        if (chatty)
-                        {
-                            Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
-                        }
-                        RuleOutInRow(i, j, (int)grid[i][j].Fixed);
-                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
-                        RuleOutInBox(i, j, (int)grid[i][j].Fixed);
                         changed = true;
                     }
                 }
             }
 
-            var notSolvedYet = false;
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (!(grid[i][j].Fixed > 0))
-                    {
-                        notSolvedYet = true;
-                        break;
-                    }
-                }
-                if (notSolvedYet)
-                {
-                    break;
-                }
-            }
-
-            if (changed && notSolvedYet)
+            if (changed)
             {
                 if (chatty)
                 {
@@ -160,6 +135,24 @@ namespace cc_sudoku
 
                 IterateThroughGrid();
             }
+        }
+
+        static bool CheckCellForNewFixedValue(int i, int j)
+        {
+            var changed = false;
+            if (grid[i][j].MightBe.Count == 1 && !(grid[i][j].Fixed > 0))
+            {
+                grid[i][j].Fixed = grid[i][j].MightBe[0];
+                if (chatty)
+                {
+                    Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
+                }
+                RuleOutInRow(i, j, (int)grid[i][j].Fixed);
+                RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
+                RuleOutInBox(i, j, (int)grid[i][j].Fixed);
+                changed = true;
+            }
+            return changed;
         }
 
         static void CheckRowForOnlyOption(int row)
