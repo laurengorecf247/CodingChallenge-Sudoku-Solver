@@ -155,6 +155,7 @@ namespace cc_sudoku
                                 foreach (var digit in firstToCheck.MightBe)
                                 {
                                     thirdToCheck.MightBe.Remove(digit);
+                                    changed = true;
                                 }
                             }
                         }
@@ -181,6 +182,7 @@ namespace cc_sudoku
                                 foreach (var digit in grid[row][i].MightBe)
                                 {
                                     grid[row][k].MightBe.Remove(digit);
+                                    changed = true;
                                 }
                             }
                         }
@@ -207,6 +209,7 @@ namespace cc_sudoku
                                 foreach (var digit in grid[i][column].MightBe)
                                 {
                                     grid[k][column].MightBe.Remove(digit);
+                                    changed = true;
                                 }
                             }
                         }
