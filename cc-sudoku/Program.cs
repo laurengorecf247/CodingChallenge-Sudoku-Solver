@@ -42,9 +42,9 @@ namespace cc_sudoku
                 {
                     if (grid[i][j].Fixed > 0)
                     {
-                        RuleOutInRow(i, j, (int)grid[i][j].Fixed);
-                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
-                        RuleOutInBox(i, j, (int)grid[i][j].Fixed);
+                        RuleOutInRow(i, j);
+                        RuleOutInColumn(i, j);
+                        RuleOutInBox(i, j);
                     }
                 }
             }
@@ -147,9 +147,9 @@ namespace cc_sudoku
                 {
                     Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
                 }
-                RuleOutInRow(i, j, (int)grid[i][j].Fixed);
-                RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
-                RuleOutInBox(i, j, (int)grid[i][j].Fixed);
+                RuleOutInRow(i, j);
+                RuleOutInColumn(i, j);
+                RuleOutInBox(i, j);
                 changed = true;
             }
             return changed;
@@ -356,8 +356,10 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInColumn(int row, int column, int ruleOut)
+        static void RuleOutInColumn(int row, int column)
         {
+            var ruleOut = (int)grid[row][column].Fixed;
+
             for (int i = 0; i < 9; i++)
             {
                 if (i != column)
@@ -375,8 +377,10 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInRow(int row, int column, int ruleOut)
+        static void RuleOutInRow(int row, int column)
         {
+            var ruleOut = (int)grid[row][column].Fixed;
+
             for (int i = 0; i < 9; i++)
             {
                 if (i != row)
@@ -394,8 +398,10 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInBox(int row, int column, int ruleOut)
+        static void RuleOutInBox(int row, int column)
         {
+            var ruleOut = (int)grid[row][column].Fixed;
+
             var boxRow = (int)Math.Floor(row / 3.0);
             var boxCol = (int)Math.Floor(column / 3.0);
 
