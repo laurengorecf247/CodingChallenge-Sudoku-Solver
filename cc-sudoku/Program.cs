@@ -87,6 +87,21 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
+                CheckRowForThreeSets(i, grid, chatty);
+                CheckColForThreeSets(i, grid, chatty);
+                CheckRowForTwoSets(i, grid, chatty);
+                CheckColForTwoSets(i, grid, chatty);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    CheckBoxForTwoSets(i, j, grid, chatty);
+                }
+            }
+
+            for (int i = 0; i < 9; i++)
+            {
                 CheckRowForOnlyOption(i, grid, chatty);
                 CheckColForOnlyOption(i, grid, chatty);
             }
@@ -118,20 +133,24 @@ namespace cc_sudoku
                 }
             }
 
+            var notSolvedYet = false;
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForTwoSets(i, grid, chatty);
-                CheckColForTwoSets(i, grid, chatty);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 9; j++)
                 {
-                    CheckBoxForTwoSets(i, j, grid, chatty);
+                    if (!(grid[i][j].Fixed > 0))
+                    {
+                        notSolvedYet = true;
+                        break;
+                    }
+                }
+                if (notSolvedYet)
+                {
+                    break;
                 }
             }
 
-            if (changed)
+            if (changed && notSolvedYet)
             {
                 if (chatty)
                 {
@@ -260,6 +279,41 @@ namespace cc_sudoku
             }
         }
 
+        static void CheckBoxForThreeSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    for (int k = 0; k < 9; k++)
+                    {
+                        var firstToCheck = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
+                        var secondToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
+                        var thirdToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
+
+                        if (firstToCheck.MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(secondToCheck.MightBe, firstToCheck.MightBe))
+                        {
+                            for (int m = 0; m < 9; m++)
+                            {
+                                var fourthToCheck = grid[boxRow * 3 + m % 3][boxCol * 3 + (int)Math.Floor(m / 3.0)];
+                                if (m != i && m != j && m != k)
+                                {
+                                    foreach (var digit in firstToCheck.MightBe)
+                                    {
+                                        fourthToCheck.MightBe.Remove(digit);
+                                        if (chatty)
+                                        {
+                                            Console.WriteLine((boxRow * 3 + m % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(m / 3.0) + 1) + " can't be " + digit + ": 3-subset in box");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         static void CheckRowForTwoSets(int row, Cell[][] grid, bool chatty)
         {
             for (int i = 0; i < 9; i++)
@@ -287,6 +341,36 @@ namespace cc_sudoku
             }
         }
 
+        static void CheckRowForThreeSets(int row, Cell[][] grid, bool chatty)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    for (int k = 0; k < 9; k++)
+                    {
+                        if (grid[row][i].MightBe.Count == 3 && j != i && k != i && j != k && Enumerable.SequenceEqual(grid[row][i].MightBe, grid[row][j].MightBe) && Enumerable.SequenceEqual(grid[row][i].MightBe, grid[row][k].MightBe))
+                        {
+                            for (int m = 0; m < 9; m++)
+                            {
+                                if (m != i && m != j && m != k)
+                                {
+                                    foreach (var digit in grid[row][i].MightBe)
+                                    {
+                                        grid[row][m].MightBe.Remove(digit);
+                                        if (chatty)
+                                        {
+                                            Console.WriteLine((row + 1) + "," + (m + 1) + " can't be " + digit + ": 3-subset in row");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         static void CheckColForTwoSets(int column, Cell[][] grid, bool chatty)
         {
             for (int i = 0; i < 9; i++)
@@ -305,6 +389,36 @@ namespace cc_sudoku
                                     if (chatty)
                                     {
                                         Console.WriteLine((k + 1) + "," + (column + 1) + " can't be " + digit + ": 2-subset in column");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        static void CheckColForThreeSets(int column, Cell[][] grid, bool chatty)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    for (int k = 0; k < 9; k++)
+                    {
+                        if (grid[i][column].MightBe.Count == 3 && j != i && j != k && i != k && Enumerable.SequenceEqual(grid[j][column].MightBe, grid[i][column].MightBe) && Enumerable.SequenceEqual(grid[k][column].MightBe, grid[i][column].MightBe))
+                        {
+                            for (int m = 0; m < 9; m++)
+                            {
+                                if (m != i && m != j && m != k)
+                                {
+                                    foreach (var digit in grid[i][column].MightBe)
+                                    {
+                                        grid[m][column].MightBe.Remove(digit);
+                                        if (chatty)
+                                        {
+                                            Console.WriteLine((m + 1) + "," + (column + 1) + " can't be " + digit + ": 3-subset in column");
+                                        }
                                     }
                                 }
                             }
