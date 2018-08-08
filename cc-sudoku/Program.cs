@@ -104,30 +104,11 @@ namespace cc_sudoku
             Console.WriteLine("Solving...");
             var changed = false;
 
-            for (int i = 0; i < 9; i++)
-            {
-                CheckForSets(i, CheckType.Row);
-                CheckForSets(i, CheckType.Column);
-                CheckForSets(i, CheckType.Box);
-            }
+            CheckForSets();
 
-            for (int i = 0; i < 9; i++)
-            {
-                CheckForLocatedDigit(i, CheckType.Row);
-                CheckForLocatedDigit(i, CheckType.Column);
-                CheckForLocatedDigit(i, CheckType.Box);
-            }
+            CheckForLocatedDigits();
 
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (CheckForFixedCell(i, j))
-                    {
-                        changed = true;
-                    }
-                }
-            }
+            changed = CheckForFixedCells();
 
             if (changed)
             {
@@ -138,6 +119,22 @@ namespace cc_sudoku
 
                 IterateThroughGrid();
             }
+        }
+
+        static bool CheckForFixedCells()
+        {
+            var changed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (CheckForFixedCell(i, j))
+                    {
+                        changed = true;
+                    }
+                }
+            }
+            return changed;
         }
 
         static bool CheckForFixedCell(int i, int j)
@@ -156,7 +153,17 @@ namespace cc_sudoku
             return changed;
         }
 
-        static void CheckForLocatedDigit(int checkNumber, CheckType checkType)
+        static void CheckForLocatedDigits()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                CheckForLocatedDigits(i, CheckType.Row);
+                CheckForLocatedDigits(i, CheckType.Column);
+                CheckForLocatedDigits(i, CheckType.Box);
+            }
+        }
+
+        static void CheckForLocatedDigits(int checkNumber, CheckType checkType)
         {
             var digits = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
@@ -186,6 +193,16 @@ namespace cc_sudoku
                         }
                     }
                 }
+            }
+        }
+
+        static void CheckForSets()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                CheckForSets(i, CheckType.Row);
+                CheckForSets(i, CheckType.Column);
+                CheckForSets(i, CheckType.Box);
             }
         }
 
