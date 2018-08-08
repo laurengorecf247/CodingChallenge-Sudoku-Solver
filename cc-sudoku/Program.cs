@@ -290,30 +290,21 @@ namespace cc_sudoku
                 switch (checkType)
                 {
                     case CheckType.Row:
-                        if (i == column)
-                        {
-                            continue;
-                        }
                         removeCell = grid[row][i];
                         break;
                     case CheckType.Column:
-                        if (i == row)
-                        {
-                            continue;
-                        }
                         removeCell = grid[i][column];
                         break;
                     case CheckType.Box:
                         var usingRow = (3 * (int)Math.Floor(row / 3.0)) + i % 3;
                         var usingCol = (3 * (int)Math.Floor(column / 3.0)) + (int)Math.Floor(i / 3.0);
-                        if (usingRow == row && usingCol == column)
-                        {
-                            continue;
-                        }
                         removeCell = grid[usingRow][usingCol];
                         break;
                 }
-                removeCell.MightBe.Remove(ruleOut);
+                if (!(removeCell.Fixed > 0))
+                {
+                    removeCell.MightBe.Remove(ruleOut);
+                }
                 if (removeCell.MightBe.Count == 0)
                 {
                     throw new Exception(checkType.ToString() + ": Ruled out all options for " + removeCell.X + "," + removeCell.Y);
