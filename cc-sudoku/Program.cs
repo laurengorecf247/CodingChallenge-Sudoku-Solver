@@ -7,12 +7,13 @@ namespace cc_sudoku
 {
     class Program
     {
+        internal const bool chatty = false;
+        internal static Cell[][] grid;
+
         static void Main(string[] args)
         {
-            bool chatty = false;
-
             string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku2.csv");
-            Cell[][] grid = new Cell[9][];
+            grid = new Cell[9][];
             for (int i = 0; i < 9; i++)
             {
                 grid[i] = new Cell[9];
@@ -32,7 +33,7 @@ namespace cc_sudoku
             }
 
             Console.WriteLine("Problem = ");
-            WriteGrid(grid);
+            WriteGrid();
 
             for (int i = 0; i < 9; i++)
             {
@@ -40,18 +41,19 @@ namespace cc_sudoku
                 {
                     if (grid[i][j].Fixed > 0)
                     {
-                        RuleOutInRow(i, j, (int)grid[i][j].Fixed, grid, chatty);
-                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed, grid, chatty);
-                        RuleOutInBox(i, j, (int)grid[i][j].Fixed, grid, chatty);
+                        RuleOutInRow(i, j, (int)grid[i][j].Fixed);
+                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
+                        RuleOutInBox(i, j, (int)grid[i][j].Fixed);
                     }
                 }
             }
+            Console.WriteLine();
 
-            IterateThroughGrid(grid, chatty);
+            IterateThroughGrid();
 
             Console.WriteLine();
             Console.WriteLine("Solution = ");
-            WriteGrid(grid);
+            WriteGrid();
 
             for (int i = 0; i < 9; i++)
             {
@@ -68,7 +70,7 @@ namespace cc_sudoku
             Console.ReadLine();
         }
 
-        static void WriteGrid(Cell[][] grid)
+        static void WriteGrid()
         {
             foreach (Cell[] line in grid)
             {
@@ -80,37 +82,37 @@ namespace cc_sudoku
             }
         }
 
-        static void IterateThroughGrid(Cell[][] grid, bool chatty)
+        static void IterateThroughGrid()
         {
             Console.WriteLine("Solving...");
             var changed = false;
 
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForThreeSets(i, grid, chatty);
-                CheckColForThreeSets(i, grid, chatty);
-                CheckRowForTwoSets(i, grid, chatty);
-                CheckColForTwoSets(i, grid, chatty);
+                CheckRowForThreeSets(i);
+                CheckColForThreeSets(i);
+                CheckRowForTwoSets(i);
+                CheckColForTwoSets(i);
             }
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    CheckBoxForTwoSets(i, j, grid, chatty);
+                    CheckBoxForTwoSets(i, j);
                 }
             }
 
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForOnlyOption(i, grid, chatty);
-                CheckColForOnlyOption(i, grid, chatty);
+                CheckRowForOnlyOption(i);
+                CheckColForOnlyOption(i);
             }
 
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    CheckBoxForOnlyOption(i, j, grid, chatty);
+                    CheckBoxForOnlyOption(i, j);
                 }
             }
 
@@ -125,9 +127,9 @@ namespace cc_sudoku
                         {
                             Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
                         }
-                        RuleOutInRow(i, j, (int)grid[i][j].Fixed, grid, chatty);
-                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed, grid, chatty);
-                        RuleOutInBox(i, j, (int)grid[i][j].Fixed, grid, chatty);
+                        RuleOutInRow(i, j, (int)grid[i][j].Fixed);
+                        RuleOutInColumn(i, j, (int)grid[i][j].Fixed);
+                        RuleOutInBox(i, j, (int)grid[i][j].Fixed);
                         changed = true;
                     }
                 }
@@ -154,14 +156,14 @@ namespace cc_sudoku
             {
                 if (chatty)
                 {
-                    WriteGrid(grid);
+                    WriteGrid();
                 }
 
-                IterateThroughGrid(grid, chatty);
+                IterateThroughGrid();
             }
         }
 
-        static void CheckRowForOnlyOption(int row, Cell[][] grid, bool chatty)
+        static void CheckRowForOnlyOption(int row)
         {
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
@@ -190,7 +192,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckColForOnlyOption(int col, Cell[][] grid, bool chatty)
+        static void CheckColForOnlyOption(int col)
         {
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
@@ -219,7 +221,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForOnlyOption(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        static void CheckBoxForOnlyOption(int boxRow, int boxCol)
         {
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
@@ -248,7 +250,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForTwoSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        static void CheckBoxForTwoSets(int boxRow, int boxCol)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -279,7 +281,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForThreeSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        static void CheckBoxForThreeSets(int boxRow, int boxCol)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -314,7 +316,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckRowForTwoSets(int row, Cell[][] grid, bool chatty)
+        static void CheckRowForTwoSets(int row)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -341,7 +343,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckRowForThreeSets(int row, Cell[][] grid, bool chatty)
+        static void CheckRowForThreeSets(int row)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -371,7 +373,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckColForTwoSets(int column, Cell[][] grid, bool chatty)
+        static void CheckColForTwoSets(int column)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -398,7 +400,7 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckColForThreeSets(int column, Cell[][] grid, bool chatty)
+        static void CheckColForThreeSets(int column)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -428,7 +430,7 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInColumn(int row, int column, int ruleOut, Cell[][] grid, bool chatty)
+        static void RuleOutInColumn(int row, int column, int ruleOut)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -447,7 +449,7 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInRow(int row, int column, int ruleOut, Cell[][] grid, bool chatty)
+        static void RuleOutInRow(int row, int column, int ruleOut)
         {
             for (int i = 0; i < 9; i++)
             {
@@ -466,7 +468,7 @@ namespace cc_sudoku
             }
         }
 
-        static void RuleOutInBox(int row, int column, int ruleOut, Cell[][] grid, bool chatty)
+        static void RuleOutInBox(int row, int column, int ruleOut)
         {
             var boxRow = (int)Math.Floor(row / 3.0);
             var boxCol = (int)Math.Floor(column / 3.0);
