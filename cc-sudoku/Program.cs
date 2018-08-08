@@ -231,12 +231,6 @@ namespace cc_sudoku
 
         static void CheckBoxForSets(int boxRow, int boxCol)
         {
-
-            if (boxRow == 2 && boxCol == 0)
-            {
-                var x = 1;
-            }
-
             var setsChecked = new List<List<int>>();
 
             for (int i = 0; i < 9; i++)
