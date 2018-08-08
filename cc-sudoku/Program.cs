@@ -257,7 +257,7 @@ namespace cc_sudoku
                                     removeCell.MightBe.Remove(digit);
                                     if (chatty)
                                     {
-                                        Console.WriteLine((boxRow * 3 + j % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(j / 3.0) + 1) + " can't be " + digit + ": " + set.Count + "-subset in box");
+                                        Console.WriteLine((boxRow * 3 + j % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(j / 3.0) + 1) + " can't be " + digit + ": " + set.Count + "-set in box");
                                     }
                                 }
                             }
@@ -296,7 +296,7 @@ namespace cc_sudoku
                                 removeCell.MightBe.Remove(digit);
                                 if (chatty)
                                 {
-                                    Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": " + set.Count + "-subset in row");
+                                    Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": " + set.Count + "-set in row");
                                 }
                             }
                         }
@@ -334,7 +334,7 @@ namespace cc_sudoku
                                 removeCell.MightBe.Remove(digit);
                                 if (chatty)
                                 {
-                                    Console.WriteLine((k + 1) + "," + (col + 1) + " can't be " + digit + ": " + set.Count + "-subset in column");
+                                    Console.WriteLine((k + 1) + "," + (col + 1) + " can't be " + digit + ": " + set.Count + "-set in column");
                                 }
                             }
                         }
