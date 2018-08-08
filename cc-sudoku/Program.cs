@@ -159,6 +159,7 @@ namespace cc_sudoku
             for (int i = 0; i < 9; i++)
             {
                 var checkCell = GetCell(checkNumber, i, checkType);
+
                 foreach (var option in checkCell.MightBe)
                 {
                     options[(option - 1)]++;
@@ -171,6 +172,7 @@ namespace cc_sudoku
                     for (int i = 0; i < 9; i++)
                     {
                         var setCell = GetCell(checkNumber, i, checkType);
+
                         if (setCell.MightBe.IndexOf(option) != -1 && !(setCell.Fixed > 0))
                         {
                             setCell.MightBe = new List<int> { option };
@@ -244,6 +246,7 @@ namespace cc_sudoku
                         if (!setsFound.Contains(k))
                         {
                             var removeCell = GetCell(checkNumber, k, checkType);
+
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
