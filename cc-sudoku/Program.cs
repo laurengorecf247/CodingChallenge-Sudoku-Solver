@@ -278,30 +278,17 @@ namespace cc_sudoku
 
         static void RuleOut(int row, int column)
         {
-            RuleOutInType(row, column, CheckType.Row, (int)grid[row][column].Fixed);
-            RuleOutInType(row, column, CheckType.Column, (int)grid[row][column].Fixed);
-            RuleOutInType(row, column, CheckType.Box, (int)grid[row][column].Fixed);
+            RuleOutInType(row, CheckType.Row, (int)grid[row][column].Fixed);
+            RuleOutInType(column, CheckType.Column, (int)grid[row][column].Fixed);
+            RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, (int)grid[row][column].Fixed);
         }
 
-        static void RuleOutInType(int row, int column, CheckType checkType, int ruleOut)
+        static void RuleOutInType(int checkNum, CheckType checkType, int ruleOut)
         {
             for (int i = 0; i < 9; i++)
             {
-                var removeCell = new Cell();
-                switch (checkType)
-                {
-                    case CheckType.Row:
-                        removeCell = grid[row][i];
-                        break;
-                    case CheckType.Column:
-                        removeCell = grid[i][column];
-                        break;
-                    case CheckType.Box:
-                        var usingRow = (3 * (int)Math.Floor(row / 3.0)) + i % 3;
-                        var usingCol = (3 * (int)Math.Floor(column / 3.0)) + (int)Math.Floor(i / 3.0);
-                        removeCell = grid[usingRow][usingCol];
-                        break;
-                }
+                var removeCell = GetCell(checkNum, i, checkType);
+
                 if (!(removeCell.Fixed > 0))
                 {
                     removeCell.MightBe.Remove(ruleOut);
@@ -325,7 +312,7 @@ namespace cc_sudoku
                     cell = grid[i][checkNumber];
                     break;
                 case CheckType.Box:
-                    cell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
+                    cell = grid[3 * (int)Math.Floor(checkNumber / 3.0) + (int)Math.Floor(i / 3.0)][3 * (checkNumber % 3) + i % 3];
                     break;
             }
             return cell;
