@@ -43,6 +43,8 @@ namespace cc_sudoku
                 {
                     grid[i][j] = new Cell
                     {
+                        X = i + 1,
+                        Y = j + 1,
                         MightBe = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
                     };
                     if (!string.IsNullOrWhiteSpace(digits[j]))
@@ -86,10 +88,11 @@ namespace cc_sudoku
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if (grid[i][j].MightBe.Count > 1)
+                    var stuckCell = grid[i][j];
+                    if (stuckCell.MightBe.Count > 1)
                     {
                         {
-                            Console.WriteLine("Stuck on " + (i + 1) + "," + (j + 1) + " - could be " + string.Join(",", grid[i][j].MightBe));
+                            Console.WriteLine("Stuck on " + stuckCell.X + "," + stuckCell.Y + " - could be " + string.Join(",", stuckCell.MightBe));
                         }
                     }
                 }
@@ -145,7 +148,7 @@ namespace cc_sudoku
                 grid[i][j].Fixed = grid[i][j].MightBe[0];
                 if (chatty)
                 {
-                    Console.WriteLine((i + 1) + "," + (j + 1) + " has only one option remaining, setting value to " + grid[i][j].Fixed);
+                    Console.WriteLine(grid[i][j].X + "," + grid[i][j].Y + " is now " + grid[i][j].Fixed);
                 }
                 RuleOut(i, j);
                 changed = true;
@@ -178,18 +181,7 @@ namespace cc_sudoku
                             setCell.MightBe = new List<int> { digit };
                             if (chatty)
                             {
-                                switch (checkType)
-                                {
-                                    case CheckType.Row:
-                                        Console.WriteLine("In row " + (checkNumber + 1) + ", " + digit + " can only go in " + (checkNumber + 1) + "," + (i + 1));
-                                        break;
-                                    case CheckType.Column:
-                                        Console.WriteLine("In column " + (checkNumber + 1) + ", " + digit + " can only go in " + (i + 1) + "," + (checkNumber + 1));
-                                        break;
-                                    case CheckType.Box:
-                                        Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", " + digit + " can only go in " + ((checkNumber % 3) * 3 + i % 3 + 1) + "," + (((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0) + 1));
-                                        break;
-                                }
+                                Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.X + "," + setCell.Y);
                             }
                         }
                     }
@@ -250,6 +242,10 @@ namespace cc_sudoku
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
+                                if (removeCell.MightBe.Count == 0)
+                                {
+                                    throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Set check ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                                }
                                 removed = true;
                             }
                         }
@@ -257,55 +253,53 @@ namespace cc_sudoku
                 }
                 if (removed && chatty)
                 {
-                    switch (checkType)
-                    {
-                        case CheckType.Row:
-                            Console.WriteLine("In row " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
-                            break;
-                        case CheckType.Column:
-                            Console.WriteLine("In column " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
-                            break;
-                        case CheckType.Box:
-                            Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
-                            break;
-                    }
+                    Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
         }
 
         static void RuleOut(int row, int column)
         {
-            var ruleOut = (int)grid[row][column].Fixed;
+            RuleOutInType(row, column, CheckType.Row, (int)grid[row][column].Fixed);
+            RuleOutInType(row, column, CheckType.Column, (int)grid[row][column].Fixed);
+            RuleOutInType(row, column, CheckType.Box, (int)grid[row][column].Fixed);
+        }
 
+        static void RuleOutInType(int row, int column, CheckType checkType, int ruleOut)
+        {
             for (int i = 0; i < 9; i++)
             {
-                if (i != column)
+                var removeCell = new Cell();
+                switch (checkType)
                 {
-                    grid[row][i].MightBe.Remove(ruleOut);
-                    if (grid[row][i].MightBe.Count == 0)
-                    {
-                        throw new Exception("COL: Ruled out all options for " + (row + 1) + "," + (i + 1));
-                    }
+                    case CheckType.Row:
+                        if (i == column)
+                        {
+                            continue;
+                        }
+                        removeCell = grid[row][i];
+                        break;
+                    case CheckType.Column:
+                        if (i == row)
+                        {
+                            continue;
+                        }
+                        removeCell = grid[i][column];
+                        break;
+                    case CheckType.Box:
+                        var usingRow = (3 * (int)Math.Floor(row / 3.0)) + i % 3;
+                        var usingCol = (3 * (int)Math.Floor(column / 3.0)) + (int)Math.Floor(i / 3.0);
+                        if (usingRow == row && usingCol == column)
+                        {
+                            continue;
+                        }
+                        removeCell = grid[usingRow][usingCol];
+                        break;
                 }
-
-                if (i != row)
+                removeCell.MightBe.Remove(ruleOut);
+                if (removeCell.MightBe.Count == 0)
                 {
-                    grid[i][column].MightBe.Remove(ruleOut);
-                    if (grid[i][column].MightBe.Count == 0)
-                    {
-                        throw new Exception("ROW: Ruled out all options for " + (i + 1) + "," + (column + 1));
-                    }
-                }
-
-                var usingRow = (3 * (int)Math.Floor(row / 3.0)) + i % 3;
-                var usingCol = (3 * (int)Math.Floor(column / 3.0)) + (int)Math.Floor(i / 3.0);
-                if (usingRow != row || usingCol != column)
-                {
-                    grid[usingRow][usingCol].MightBe.Remove(ruleOut);
-                    if (grid[usingRow][usingCol].MightBe.Count == 0)
-                    {
-                        throw new Exception("BOX: Ruled out all options for " + (usingRow + 1) + "," + (usingCol + 1));
-                    }
+                    throw new Exception(checkType.ToString() + ": Ruled out all options for " + removeCell.X + "," + removeCell.Y);
                 }
             }
         }
@@ -334,6 +328,10 @@ namespace cc_sudoku
         public int? Fixed { get; set; }
 
         public List<int> MightBe { get; set; }
+
+        public int X { get; set; }
+
+        public int Y { get; set; }
     }
 
     enum CheckType
