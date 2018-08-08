@@ -132,7 +132,7 @@ namespace cc_sudoku
                 grid[i][j].Fixed = grid[i][j].MightBe[0];
                 if (chatty)
                 {
-                    Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
+                    Console.WriteLine((i + 1) + "," + (j + 1) + " has only one option remaining, setting value to " + grid[i][j].Fixed);
                 }
                 RuleOutInRow(i, j);
                 RuleOutInColumn(i, j);
@@ -221,7 +221,7 @@ namespace cc_sudoku
                             grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In box " + (boxRow + 1) + "," + (boxCol + 1) + ", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
+                                Console.WriteLine("In box " + (boxRow + 1) + "-" + (boxCol + 1) + ", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
                             }
                         }
                     }
@@ -231,12 +231,40 @@ namespace cc_sudoku
 
         static void CheckBoxForSets(int boxRow, int boxCol)
         {
+
+            if (boxRow == 2 && boxCol == 0)
+            {
+                var x = 1;
+            }
+
+            var setsChecked = new List<List<int>>();
+
             for (int i = 0; i < 9; i++)
             {
                 var basisCell = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
                 var set = basisCell.MightBe;
+
+                if (set.Count == 1)
+                {
+                    continue;
+                }
+                var redundant = false;
+                foreach (var setChecked in setsChecked)
+                {
+                    if (Enumerable.SequenceEqual(set, setChecked)) {
+                        redundant = true;
+                        break;
+                    }
+                }
+                if (redundant)
+                {
+                    continue;
+                }
+                setsChecked.Add(set);
+
                 var setsFound = new List<int> { i };
 
+                var removed = false;
                 for (int j = 0; j < 9; j++)
                 {
                     var checkCell = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
@@ -255,26 +283,50 @@ namespace cc_sudoku
                                 foreach (var digit in set)
                                 {
                                     removeCell.MightBe.Remove(digit);
-                                    if (chatty)
-                                    {
-                                        Console.WriteLine((boxRow * 3 + j % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(j / 3.0) + 1) + " can't be " + digit + ": " + set.Count + "-set in box");
-                                    }
+                                    removed = true;
                                 }
                             }
                         }
                     }
+                }
+                if (removed && chatty)
+                {
+                    Console.WriteLine("In box " + (boxRow + 1) + "-" + (boxCol + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
         }
 
         static void CheckRowForSets(int row)
         {
+            var setsChecked = new List<List<int>>();
+
             for (int i = 0; i < 9; i++)
             {
                 var basisCell = grid[row][i];
                 var set = basisCell.MightBe;
+
+                if (set.Count == 1)
+                {
+                    continue;
+                }
+                var redundant = false;
+                foreach (var setChecked in setsChecked)
+                {
+                    if (Enumerable.SequenceEqual(set, setChecked))
+                    {
+                        redundant = true;
+                        break;
+                    }
+                }
+                if (redundant)
+                {
+                    continue;
+                }
+                setsChecked.Add(set);
+
                 var setsFound = new List<int> { i };
 
+                var removed = false;
                 for (int j = 0; j < 9; j++)
                 {
                     var checkCell = grid[row][j];
@@ -294,25 +346,49 @@ namespace cc_sudoku
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
-                                if (chatty)
-                                {
-                                    Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": " + set.Count + "-set in row");
-                                }
+                                removed = true;
                             }
                         }
                     }
+                }
+                if (removed && chatty)
+                {
+                    Console.WriteLine("In row " + (row + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
         }
 
         static void CheckColForSets(int col)
         {
+            var setsChecked = new List<List<int>>();
+
             for (int i = 0; i < 9; i++)
             {
                 var basisCell = grid[i][col];
                 var set = grid[i][col].MightBe;
+
+                if (set.Count == 1)
+                {
+                    continue;
+                }
+                var redundant = false;
+                foreach (var setChecked in setsChecked)
+                {
+                    if (Enumerable.SequenceEqual(set, setChecked))
+                    {
+                        redundant = true;
+                        break;
+                    }
+                }
+                if (redundant)
+                {
+                    continue;
+                }
+                setsChecked.Add(set);
+
                 var setsFound = new List<int> { i };
 
+                var removed = false;
                 for (int j = 0; j < 9; j++)
                 {
                     var checkCell = grid[j][col];
@@ -332,13 +408,14 @@ namespace cc_sudoku
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
-                                if (chatty)
-                                {
-                                    Console.WriteLine((k + 1) + "," + (col + 1) + " can't be " + digit + ": " + set.Count + "-set in column");
-                                }
+                                removed = true;
                             }
                         }
                     }
+                }
+                if (removed && chatty)
+                {
+                    Console.WriteLine("In column " + (col + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
         }
@@ -352,10 +429,6 @@ namespace cc_sudoku
                 if (i != column)
                 {
                     grid[row][i].MightBe.Remove(ruleOut);
-                    if (chatty)
-                    {
-                        Console.WriteLine((row + 1) + "," + (i + 1) + " can't be " + ruleOut + ": exists in column");
-                    }
                     if (grid[row][i].MightBe.Count == 0)
                     {
                         throw new Exception("COL: Ruled out all options for " + row + "," + i);
@@ -373,10 +446,6 @@ namespace cc_sudoku
                 if (i != row)
                 {
                     grid[i][column].MightBe.Remove(ruleOut);
-                    if (chatty)
-                    {
-                        Console.WriteLine((i + 1) + "," + (column + 1) + " can't be " + ruleOut + ": exists in row");
-                    }
                     if (grid[i][column].MightBe.Count == 0)
                     {
                         throw new Exception("ROW: Ruled out all options for " + i + "," + column);
@@ -401,10 +470,6 @@ namespace cc_sudoku
                     if (usingRow != row || usingCol != column)
                     {
                         grid[usingRow][usingCol].MightBe.Remove(ruleOut);
-                        if (chatty)
-                        {
-                            Console.WriteLine((usingRow + 1) + "," + (usingCol + 1) + " can't be " + ruleOut + ": exists in box");
-                        }
                         if (grid[usingRow][usingCol].MightBe.Count == 0)
                         {
                             throw new Exception("BOX: Ruled out all options for " + usingRow + "," + usingCol);
