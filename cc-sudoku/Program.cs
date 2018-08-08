@@ -15,6 +15,26 @@ namespace cc_sudoku
             string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku5.csv");
             grid = new Cell[9][];
 
+            InitialiseGrid(puzzle);
+
+            Console.WriteLine("Problem = ");
+            WriteGrid();
+            Console.WriteLine();
+
+            DoInitialRuleOuts();
+
+            IterateThroughGrid();
+
+            Console.WriteLine();
+            Console.WriteLine("Solution = ");
+            WriteGrid();
+            WriteStuckCells();
+
+            Console.ReadLine();
+        }
+
+        static void InitialiseGrid(string[] puzzle)
+        {
             for (int i = 0; i < 9; i++)
             {
                 grid[i] = new Cell[9];
@@ -32,10 +52,10 @@ namespace cc_sudoku
                     }
                 }
             }
+        }
 
-            Console.WriteLine("Problem = ");
-            WriteGrid();
-
+        static void DoInitialRuleOuts()
+        {
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -46,27 +66,6 @@ namespace cc_sudoku
                     }
                 }
             }
-            Console.WriteLine();
-
-            IterateThroughGrid();
-
-            Console.WriteLine();
-            Console.WriteLine("Solution = ");
-            WriteGrid();
-
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (grid[i][j].MightBe.Count > 1)
-                    {
-                        {
-                            Console.WriteLine("Stuck on " + (i + 1) + "," + (j + 1) + " - could be " + string.Join(",", grid[i][j].MightBe));
-                        }
-                    }
-                }
-            }
-            Console.ReadLine();
         }
 
         static void WriteGrid()
@@ -78,6 +77,22 @@ namespace cc_sudoku
                     Console.Write((digit.Fixed > 0 ? digit.Fixed.ToString() : " ") + "|");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        static void WriteStuckCells()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[i][j].MightBe.Count > 1)
+                    {
+                        {
+                            Console.WriteLine("Stuck on " + (i + 1) + "," + (j + 1) + " - could be " + string.Join(",", grid[i][j].MightBe));
+                        }
+                    }
+                }
             }
         }
 
