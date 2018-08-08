@@ -105,39 +105,33 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                if (CheckRowForTwoSets(i, grid, chatty))
-                {
-                    changed = true;
-                }
+                CheckRowForTwoSets(i, grid, chatty);
             }
             for (int i = 0; i < 9; i++)
             {
-                if (CheckColForTwoSets(i, grid, chatty))
-                {
-                    changed = true;
-                }
+                CheckColForTwoSets(i, grid, chatty);
             }
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (CheckBoxForTwoSets(i, j, grid, chatty))
-                    {
-                        changed = true;
-                    }
+                    CheckBoxForTwoSets(i, j, grid, chatty);
                 }
             }
 
             if (changed)
             {
+                if (chatty)
+                {
+                    WriteGrid(grid);
+                }
+
                 IterateThroughGrid(grid, chatty);
             }
         }
 
-        static bool CheckBoxForTwoSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
+        static void CheckBoxForTwoSets(int boxRow, int boxCol, Cell[][] grid, bool chatty)
         {
-            var changed = false;
-
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -166,13 +160,10 @@ namespace cc_sudoku
                     }
                 }
             }
-            return changed;
         }
 
-        static bool CheckRowForTwoSets(int row, Cell[][] grid, bool chatty)
+        static void CheckRowForTwoSets(int row, Cell[][] grid, bool chatty)
         {
-            var changed = false;
-
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -197,13 +188,10 @@ namespace cc_sudoku
                     }
                 }
             }
-            return changed;
         }
 
-        static bool CheckColForTwoSets(int column, Cell[][] grid, bool chatty)
+        static void CheckColForTwoSets(int column, Cell[][] grid, bool chatty)
         {
-            var changed = false;
-
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
@@ -228,7 +216,6 @@ namespace cc_sudoku
                     }
                 }
             }
-            return changed;
         }
 
         static void RuleOutInColumn(int row, int column, int ruleOut, Cell[][] grid, bool chatty)
