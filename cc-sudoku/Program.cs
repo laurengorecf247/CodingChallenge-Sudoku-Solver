@@ -143,22 +143,7 @@ namespace cc_sudoku
             var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
             {
-                var checkCell = new Cell();
-                switch (checkType)
-                {
-                    case CheckType.Row:
-                        checkCell = grid[checkNumber][i];
-                        break;
-                    case CheckType.Column:
-                        checkCell = grid[i][checkNumber];
-                        break;
-                    case CheckType.Box:
-                        int boxRow = checkNumber % 3;
-                        int boxCol = (int)Math.Floor(checkNumber / 3.0);
-
-                        checkCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
-                        break;
-                }
+                var checkCell = GetCell(checkNumber, i, checkType);
                 foreach (var option in checkCell.MightBe)
                 {
                     options[(option - 1)]++;
@@ -170,19 +155,7 @@ namespace cc_sudoku
                 {
                     for (int i = 0; i < 9; i++)
                     {
-                        var setCell = new Cell();
-                        switch (checkType)
-                        {
-                            case CheckType.Row:
-                                setCell = grid[checkNumber][i];
-                                break;
-                            case CheckType.Column:
-                                setCell = grid[i][checkNumber];
-                                break;
-                            case CheckType.Box:
-                                setCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
-                                break;
-                        }
+                        var setCell = GetCell(checkNumber, i, checkType);
                         if (setCell.MightBe.IndexOf(option) != -1 && !(setCell.Fixed > 0))
                         {
                             setCell.MightBe = new List<int> { option };
@@ -213,19 +186,7 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                var basisCell = new Cell();
-                switch (checkType)
-                {
-                    case CheckType.Row:
-                        basisCell = grid[checkNumber][i];
-                        break;
-                    case CheckType.Column:
-                        basisCell = grid[i][checkNumber];
-                        break;
-                    case CheckType.Box:
-                        basisCell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
-                        break;
-                }
+                var basisCell = GetCell(checkNumber, i, checkType);
 
                 var set = basisCell.MightBe;
 
@@ -253,19 +214,7 @@ namespace cc_sudoku
                 var removed = false;
                 for (int j = 0; j < 9; j++)
                 {
-                    var checkCell = new Cell();
-                    switch (checkType)
-                    {
-                        case CheckType.Row:
-                            checkCell = grid[checkNumber][j];
-                            break;
-                        case CheckType.Column:
-                            checkCell = grid[j][checkNumber];
-                            break;
-                        case CheckType.Box:
-                            checkCell = grid[(checkNumber % 3) * 3 + j % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(j / 3.0)];
-                            break;
-                    }
+                    var checkCell = GetCell(checkNumber, j, checkType);
 
                     if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
                     {
@@ -279,19 +228,7 @@ namespace cc_sudoku
                     {
                         if (!setsFound.Contains(k))
                         {
-                            var removeCell = new Cell();
-                            switch (checkType)
-                            {
-                                case CheckType.Row:
-                                    removeCell = grid[checkNumber][k];
-                                    break;
-                                case CheckType.Column:
-                                    removeCell = grid[k][checkNumber];
-                                    break;
-                                case CheckType.Box:
-                                    removeCell = grid[(checkNumber % 3) * 3 + k % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(k / 3.0)];
-                                    break;
-                            }
+                            var removeCell = GetCell(checkNumber, k, checkType);
                             foreach (var digit in set)
                             {
                                 removeCell.MightBe.Remove(digit);
@@ -353,6 +290,24 @@ namespace cc_sudoku
                     }
                 }
             }
+        }
+
+        static Cell GetCell(int checkNumber, int i, CheckType checkType)
+        {
+            var cell = new Cell();
+            switch (checkType)
+            {
+                case CheckType.Row:
+                    cell = grid[checkNumber][i];
+                    break;
+                case CheckType.Column:
+                    cell = grid[i][checkNumber];
+                    break;
+                case CheckType.Box:
+                    cell = grid[(checkNumber % 3) * 3 + i % 3][((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0)];
+                    break;
+            }
+            return cell;
         }
     }
 
