@@ -60,7 +60,7 @@ namespace cc_sudoku
                     if (grid[i][j].MightBe.Count > 1)
                     {
                         {
-                            Console.WriteLine("Stuck on " + (i+1) + "," + (j+1) + " - could be " + string.Join(",", grid[i][j].MightBe));
+                            Console.WriteLine("Stuck on " + (i + 1) + "," + (j + 1) + " - could be " + string.Join(",", grid[i][j].MightBe));
                         }
                     }
                 }
@@ -93,7 +93,7 @@ namespace cc_sudoku
                         grid[i][j].Fixed = grid[i][j].MightBe[0];
                         if (chatty)
                         {
-                            Console.WriteLine("Setting " + i + "," + j + " to " + grid[i][j].Fixed);
+                            Console.WriteLine("Setting " + (i + 1) + "," + (j + 1) + " to " + grid[i][j].Fixed);
                         }
                         RuleOutInRow(i, j, (int)grid[i][j].Fixed, grid, chatty);
                         RuleOutInColumn(i, j, (int)grid[i][j].Fixed, grid, chatty);
@@ -157,7 +157,7 @@ namespace cc_sudoku
                                     thirdToCheck.MightBe.Remove(digit);
                                     if (chatty)
                                     {
-                                        Console.WriteLine((boxRow * 3 + k % 3) + "," + (boxCol * 3 + (int)Math.Floor(k / 3.0)) + " can't be " + digit + ": 2-subset in box");
+                                        Console.WriteLine((boxRow * 3 + k % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(k / 3.0) + 1) + " can't be " + digit + ": 2-subset in box");
                                     }
                                     changed = true;
                                 }
@@ -188,7 +188,7 @@ namespace cc_sudoku
                                     grid[row][k].MightBe.Remove(digit);
                                     if (chatty)
                                     {
-                                        Console.WriteLine(row + "," + k + " can't be " + digit + ": 2-subset in row");
+                                        Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": 2-subset in row");
                                     }
                                     changed = true;
                                 }
@@ -219,7 +219,7 @@ namespace cc_sudoku
                                     grid[k][column].MightBe.Remove(digit);
                                     if (chatty)
                                     {
-                                        Console.WriteLine(k + "," + column + " can't be " + digit + ": 2-subset in column");
+                                        Console.WriteLine((k + 1) + "," + (column + 1) + " can't be " + digit + ": 2-subset in column");
                                     }
                                     changed = true;
                                 }
@@ -240,7 +240,7 @@ namespace cc_sudoku
                     grid[row][i].MightBe.Remove(ruleOut);
                     if (chatty)
                     {
-                        Console.WriteLine(row + "," + i + " can't be " + ruleOut + ": exists in column");
+                        Console.WriteLine((row + 1) + "," + (i + 1) + " can't be " + ruleOut + ": exists in column");
                     }
                     if (grid[row][i].MightBe.Count == 0)
                     {
@@ -259,7 +259,7 @@ namespace cc_sudoku
                     grid[i][column].MightBe.Remove(ruleOut);
                     if (chatty)
                     {
-                        Console.WriteLine(i + "," + column + " can't be " + ruleOut + ": exists in row");
+                        Console.WriteLine((i + 1) + "," + (column + 1) + " can't be " + ruleOut + ": exists in row");
                     }
                     if (grid[i][column].MightBe.Count == 0)
                     {
@@ -285,7 +285,7 @@ namespace cc_sudoku
                         grid[usingRow][usingCol].MightBe.Remove(ruleOut);
                         if (chatty)
                         {
-                            Console.WriteLine(usingRow + "," + usingCol + " can't be " + ruleOut + ": exists in box");
+                            Console.WriteLine((usingRow + 1) + "," + (usingCol + 1) + " can't be " + ruleOut + ": exists in box");
                         }
                         if (grid[usingRow][usingCol].MightBe.Count == 0)
                         {
