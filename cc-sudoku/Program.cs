@@ -110,16 +110,16 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                CheckForOnlyOption(i, CheckType.Row);
-                CheckForOnlyOption(i, CheckType.Column);
-                CheckForOnlyOption(i, CheckType.Box);
+                CheckForLocatedDigit(i, CheckType.Row);
+                CheckForLocatedDigit(i, CheckType.Column);
+                CheckForLocatedDigit(i, CheckType.Box);
             }
 
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if (CheckCellForNewFixedValue(i, j))
+                    if (CheckForFixedCell(i, j))
                     {
                         changed = true;
                     }
@@ -137,7 +137,7 @@ namespace cc_sudoku
             }
         }
 
-        static bool CheckCellForNewFixedValue(int i, int j)
+        static bool CheckForFixedCell(int i, int j)
         {
             var changed = false;
             if (grid[i][j].MightBe.Count == 1 && !(grid[i][j].Fixed > 0))
@@ -153,41 +153,41 @@ namespace cc_sudoku
             return changed;
         }
 
-        static void CheckForOnlyOption(int checkNumber, CheckType checkType)
+        static void CheckForLocatedDigit(int checkNumber, CheckType checkType)
         {
-            var options = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            var digits = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 9; i++)
             {
                 var checkCell = GetCell(checkNumber, i, checkType);
 
-                foreach (var option in checkCell.MightBe)
+                foreach (var digit in checkCell.MightBe)
                 {
-                    options[(option - 1)]++;
+                    digits[(digit - 1)]++;
                 }
             }
-            for (int option = 1; option < 10; option++)
+            for (int digit = 1; digit < 10; digit++)
             {
-                if (options[(option - 1)] == 1)
+                if (digits[(digit - 1)] == 1)
                 {
                     for (int i = 0; i < 9; i++)
                     {
                         var setCell = GetCell(checkNumber, i, checkType);
 
-                        if (setCell.MightBe.IndexOf(option) != -1 && !(setCell.Fixed > 0))
+                        if (setCell.MightBe.IndexOf(digit) != -1 && !(setCell.Fixed > 0))
                         {
-                            setCell.MightBe = new List<int> { option };
+                            setCell.MightBe = new List<int> { digit };
                             if (chatty)
                             {
                                 switch (checkType)
                                 {
                                     case CheckType.Row:
-                                        Console.WriteLine("In row " + (checkNumber + 1) + ", " + option + " can only go in " + (checkNumber + 1) + "," + (i + 1));
+                                        Console.WriteLine("In row " + (checkNumber + 1) + ", " + digit + " can only go in " + (checkNumber + 1) + "," + (i + 1));
                                         break;
                                     case CheckType.Column:
-                                        Console.WriteLine("In column " + (checkNumber + 1) + ", " + option + " can only go in " + (i + 1) + "," + (checkNumber + 1));
+                                        Console.WriteLine("In column " + (checkNumber + 1) + ", " + digit + " can only go in " + (i + 1) + "," + (checkNumber + 1));
                                         break;
                                     case CheckType.Box:
-                                        Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", " + option + " can only go in " + ((checkNumber % 3) * 3 + i % 3 + 1) + "," + (((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0) + 1));
+                                        Console.WriteLine("In box " + (checkNumber % 3 + 1) + "-" + ((int)Math.Floor(checkNumber / 3.0) + 1) + ", " + digit + " can only go in " + ((checkNumber % 3) * 3 + i % 3 + 1) + "," + (((int)Math.Floor(checkNumber / 3.0) * 3) + (int)Math.Floor(i / 3.0) + 1));
                                         break;
                                 }
                             }
