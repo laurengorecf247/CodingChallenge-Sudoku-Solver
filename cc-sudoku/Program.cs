@@ -14,6 +14,7 @@ namespace cc_sudoku
         {
             string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku2.csv");
             grid = new Cell[9][];
+
             for (int i = 0; i < 9; i++)
             {
                 grid[i] = new Cell[9];
@@ -89,17 +90,14 @@ namespace cc_sudoku
 
             for (int i = 0; i < 9; i++)
             {
-                CheckRowForThreeSets(i);
-                CheckColForThreeSets(i);
-                CheckRowForTwoSets(i);
-                CheckColForTwoSets(i);
+                CheckRowForSets(i);
+                CheckColForSets(i);
             }
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    CheckBoxForThreeSets(i, j);
-                    CheckBoxForTwoSets(i, j);
+                    CheckBoxForSets(i, j);
                 }
             }
 
@@ -185,7 +183,7 @@ namespace cc_sudoku
                             grid[row][i].MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In row "+row+", "+option+" can only go in "+(row+1)+","+(i+1));
+                                Console.WriteLine("In row " + row + ", " + option + " can only go in " + (row + 1) + "," + (i + 1));
                             }
                         }
                     }
@@ -243,7 +241,7 @@ namespace cc_sudoku
                             grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)].MightBe = new List<int> { option };
                             if (chatty)
                             {
-                                Console.WriteLine("In box " + (boxRow+1) + "," + (boxCol+1) +", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
+                                Console.WriteLine("In box " + (boxRow + 1) + "," + (boxCol + 1) + ", " + option + " can only go in " + (boxRow * 3 + i % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(i / 3.0) + 1));
                             }
                         }
                     }
@@ -251,28 +249,35 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForTwoSets(int boxRow, int boxCol)
+        static void CheckBoxForSets(int boxRow, int boxCol)
         {
             for (int i = 0; i < 9; i++)
             {
+                var basisCell = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
+                var set = basisCell.MightBe;
+                var setsFound = new List<int> { i };
+
                 for (int j = 0; j < 9; j++)
                 {
-                    var firstToCheck = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
-                    var secondToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
+                    var checkCell = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
+                    if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
+                    {
+                        setsFound.Add(j);
+                    }
 
-                    if (firstToCheck.MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(secondToCheck.MightBe, firstToCheck.MightBe))
+                    if (setsFound.Count == set.Count && set.Count > 1)
                     {
                         for (int k = 0; k < 9; k++)
                         {
-                            var thirdToCheck = grid[boxRow * 3 + k % 3][boxCol * 3 + (int)Math.Floor(k / 3.0)];
-                            if (k != i && k != j)
+                            if (!setsFound.Contains(k))
                             {
-                                foreach (var digit in firstToCheck.MightBe)
+                                var removeCell = grid[boxRow * 3 + k % 3][boxCol * 3 + (int)Math.Floor(k / 3.0)];
+                                foreach (var digit in set)
                                 {
-                                    thirdToCheck.MightBe.Remove(digit);
+                                    removeCell.MightBe.Remove(digit);
                                     if (chatty)
                                     {
-                                        Console.WriteLine((boxRow * 3 + k % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(k / 3.0) + 1) + " can't be " + digit + ": 2-subset in box");
+                                        Console.WriteLine((boxRow * 3 + j % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(j / 3.0) + 1) + " can't be " + digit + ": " + set.Count + "-subset in box");
                                     }
                                 }
                             }
@@ -282,33 +287,36 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckBoxForThreeSets(int boxRow, int boxCol)
+        static void CheckRowForSets(int row)
         {
             for (int i = 0; i < 9; i++)
             {
+                var basisCell = grid[row][i];
+                var set = basisCell.MightBe;
+                var setsFound = new List<int> { i };
+
                 for (int j = 0; j < 9; j++)
+                {
+                    var checkCell = grid[row][j];
+                    if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
+                    {
+                        setsFound.Add(j);
+                    }
+                }
+
+                if (setsFound.Count == set.Count && set.Count > 1)
                 {
                     for (int k = 0; k < 9; k++)
                     {
-                        var firstToCheck = grid[boxRow * 3 + i % 3][boxCol * 3 + (int)Math.Floor(i / 3.0)];
-                        var secondToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
-                        var thirdToCheck = grid[boxRow * 3 + j % 3][boxCol * 3 + (int)Math.Floor(j / 3.0)];
-
-                        if (firstToCheck.MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(secondToCheck.MightBe, firstToCheck.MightBe))
+                        if (!setsFound.Contains(k))
                         {
-                            for (int m = 0; m < 9; m++)
+                            var removeCell = grid[row][k];
+                            foreach (var digit in set)
                             {
-                                var fourthToCheck = grid[boxRow * 3 + m % 3][boxCol * 3 + (int)Math.Floor(m / 3.0)];
-                                if (m != i && m != j && m != k)
+                                removeCell.MightBe.Remove(digit);
+                                if (chatty)
                                 {
-                                    foreach (var digit in firstToCheck.MightBe)
-                                    {
-                                        fourthToCheck.MightBe.Remove(digit);
-                                        if (chatty)
-                                        {
-                                            Console.WriteLine((boxRow * 3 + m % 3 + 1) + "," + (boxCol * 3 + (int)Math.Floor(m / 3.0) + 1) + " can't be " + digit + ": 3-subset in box");
-                                        }
-                                    }
+                                    Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": " + set.Count + "-subset in row");
                                 }
                             }
                         }
@@ -317,112 +325,36 @@ namespace cc_sudoku
             }
         }
 
-        static void CheckRowForTwoSets(int row)
+        static void CheckColForSets(int col)
         {
             for (int i = 0; i < 9; i++)
             {
+                var basisCell = grid[i][col];
+                var set = grid[i][col].MightBe;
+                var setsFound = new List<int> { i };
+
                 for (int j = 0; j < 9; j++)
                 {
-                    if (grid[row][i].MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(grid[row][j].MightBe, grid[row][i].MightBe))
+                    var checkCell = grid[j][col];
+                    if (j != i && Enumerable.SequenceEqual(set, checkCell.MightBe))
                     {
-                        for (int k = 0; k < 9; k++)
-                        {
-                            if (k != i && k != j)
-                            {
-                                foreach (var digit in grid[row][i].MightBe)
-                                {
-                                    grid[row][k].MightBe.Remove(digit);
-                                    if (chatty)
-                                    {
-                                        Console.WriteLine((row + 1) + "," + (k + 1) + " can't be " + digit + ": 2-subset in row");
-                                    }
-                                }
-                            }
-                        }
+                        setsFound.Add(j);
                     }
                 }
-            }
-        }
 
-        static void CheckRowForThreeSets(int row)
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
+                if (setsFound.Count == set.Count && set.Count > 1)
                 {
                     for (int k = 0; k < 9; k++)
                     {
-                        if (grid[row][i].MightBe.Count == 3 && j != i && k != i && j != k && Enumerable.SequenceEqual(grid[row][i].MightBe, grid[row][j].MightBe) && Enumerable.SequenceEqual(grid[row][i].MightBe, grid[row][k].MightBe))
+                        if (!setsFound.Contains(k))
                         {
-                            for (int m = 0; m < 9; m++)
+                            var removeCell = grid[k][col];
+                            foreach (var digit in set)
                             {
-                                if (m != i && m != j && m != k)
+                                removeCell.MightBe.Remove(digit);
+                                if (chatty)
                                 {
-                                    foreach (var digit in grid[row][i].MightBe)
-                                    {
-                                        grid[row][m].MightBe.Remove(digit);
-                                        if (chatty)
-                                        {
-                                            Console.WriteLine((row + 1) + "," + (m + 1) + " can't be " + digit + ": 3-subset in row");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        static void CheckColForTwoSets(int column)
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (grid[i][column].MightBe.Count == 2 && j != i && Enumerable.SequenceEqual(grid[j][column].MightBe, grid[i][column].MightBe))
-                    {
-                        for (int k = 0; k < 9; k++)
-                        {
-                            if (k != i && k != j)
-                            {
-                                foreach (var digit in grid[i][column].MightBe)
-                                {
-                                    grid[k][column].MightBe.Remove(digit);
-                                    if (chatty)
-                                    {
-                                        Console.WriteLine((k + 1) + "," + (column + 1) + " can't be " + digit + ": 2-subset in column");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        static void CheckColForThreeSets(int column)
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    for (int k = 0; k < 9; k++)
-                    {
-                        if (grid[i][column].MightBe.Count == 3 && j != i && j != k && i != k && Enumerable.SequenceEqual(grid[j][column].MightBe, grid[i][column].MightBe) && Enumerable.SequenceEqual(grid[k][column].MightBe, grid[i][column].MightBe))
-                        {
-                            for (int m = 0; m < 9; m++)
-                            {
-                                if (m != i && m != j && m != k)
-                                {
-                                    foreach (var digit in grid[i][column].MightBe)
-                                    {
-                                        grid[m][column].MightBe.Remove(digit);
-                                        if (chatty)
-                                        {
-                                            Console.WriteLine((m + 1) + "," + (column + 1) + " can't be " + digit + ": 3-subset in column");
-                                        }
-                                    }
+                                    Console.WriteLine((k + 1) + "," + (col + 1) + " can't be " + digit + ": " + set.Count + "-subset in column");
                                 }
                             }
                         }
