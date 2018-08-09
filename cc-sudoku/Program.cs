@@ -55,54 +55,6 @@ namespace cc_sudoku
             }
         }
 
-        static bool RuleOutAll()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (grid[i][j].MightBe.Count == 1)
-                    {
-                        if (RuleOut(i, j))
-                        {
-                            removed = true;
-                        }
-                    }
-                }
-            }
-            return removed;
-        }
-
-        static void WriteGrid()
-        {
-            foreach (Cell[] line in grid)
-            {
-                foreach (Cell digit in line)
-                {
-                    Console.Write((digit.MightBe.Count == 1 ? digit.MightBe.First().ToString() : " ") + "|");
-                }
-                Console.WriteLine();
-            }
-        }
-
-        static void WriteStuckCells()
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    var stuckCell = grid[i][j];
-                    if (stuckCell.MightBe.Count > 1)
-                    {
-                        {
-                            Console.WriteLine("Stuck on " + stuckCell.X + "," + stuckCell.Y + " - could be " + string.Join(",", stuckCell.MightBe));
-                        }
-                    }
-                }
-            }
-        }
-
         static void IterateThroughGrid()
         {
             Console.WriteLine("Solving...");
@@ -194,7 +146,26 @@ namespace cc_sudoku
             return removed;
         }
 
-        static bool RuleOut(int row, int column)
+        static bool RuleOutAll()
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[i][j].MightBe.Count == 1)
+                    {
+                        if (RuleOutCell(i, j))
+                        {
+                            removed = true;
+                        }
+                    }
+                }
+            }
+            return removed;
+        }
+
+        static bool RuleOutCell(int row, int column)
         {
             return RuleOutInType(row, CheckType.Row, grid[row][column].MightBe.First()) || RuleOutInType(column, CheckType.Column, grid[row][column].MightBe.First()) || RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, grid[row][column].MightBe.First());
         }
@@ -213,6 +184,35 @@ namespace cc_sudoku
                 }
             }
             return removed;
+        }
+
+        static void WriteGrid()
+        {
+            foreach (Cell[] line in grid)
+            {
+                foreach (Cell digit in line)
+                {
+                    Console.Write((digit.MightBe.Count == 1 ? digit.MightBe.First().ToString() : " ") + "|");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        static void WriteStuckCells()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    var stuckCell = grid[i][j];
+                    if (stuckCell.MightBe.Count > 1)
+                    {
+                        {
+                            Console.WriteLine("Stuck on " + stuckCell.X + "," + stuckCell.Y + " - could be " + string.Join(",", stuckCell.MightBe));
+                        }
+                    }
+                }
+            }
         }
 
         static Cell GetCell(int checkNumber, int i, CheckType checkType)
