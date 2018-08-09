@@ -196,7 +196,7 @@ namespace cc_sudoku
 
         static bool RuleOut(int row, int column)
         {
-            return RuleOutInType(row, CheckType.Row, grid[row][column].MightBe.First()) || RuleOutInType(column, CheckType.Column, grid[row][column].MightBe.First()) || RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, grid[row][column].MightBe.First()));
+            return RuleOutInType(row, CheckType.Row, grid[row][column].MightBe.First()) || RuleOutInType(column, CheckType.Column, grid[row][column].MightBe.First()) || RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, grid[row][column].MightBe.First());
         }
 
         static bool RuleOutInType(int checkNum, CheckType checkType, int ruleOut)
