@@ -152,7 +152,7 @@ namespace cc_sudoku
         static bool CheckForSets(int checkNumber, CheckType checkType)
         {
             var setsChecked = new List<List<int>>();
-            var globalRemoved = false;
+            var removed = false;
 
             for (int i = 0; i < 9; i++)
             {
@@ -169,7 +169,7 @@ namespace cc_sudoku
 
                 var setsFound = new List<int> { i };
 
-                var removed = false;
+                var chattyRemoved = false;
                 for (int j = 0; j < 9; j++)
                 {
                     var checkCell = GetCell(checkNumber, j, checkType);
@@ -197,19 +197,19 @@ namespace cc_sudoku
                                     {
                                         throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Set check ruled out all options for " + removeCell.X + "," + removeCell.Y);
                                     }
+                                    chattyRemoved = true;
                                     removed = true;
-                                    globalRemoved = true;
                                 }
                             }
                         }
                     }
                 }
-                if (removed && chatty)
+                if (chattyRemoved && chatty)
                 {
                     Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
                 }
             }
-            return globalRemoved;
+            return removed;
         }
 
         static bool RuleOut(int row, int column)
