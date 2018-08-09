@@ -292,10 +292,10 @@ namespace cc_sudoku
                 if (!(removeCell.Fixed > 0))
                 {
                     removeCell.MightBe.Remove(ruleOut);
-                }
-                if (removeCell.MightBe.Count == 0)
-                {
-                    throw new Exception(checkType.ToString() + ": Ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                    if (removeCell.MightBe.Count == 0)
+                    {
+                        throw new Exception(checkType.ToString() + ": Ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                    }
                 }
             }
         }
