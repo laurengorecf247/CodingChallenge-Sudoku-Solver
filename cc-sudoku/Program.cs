@@ -70,6 +70,56 @@ namespace cc_sudoku
             }
         }
 
+        static bool CheckForLocatedDigits()
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (CheckForLocatedDigits(i, CheckType.Row) || CheckForLocatedDigits(i, CheckType.Column) || CheckForLocatedDigits(i, CheckType.Box))
+                {
+                    removed = true;
+                }
+            }
+            return removed;
+        }
+
+        static bool CheckForLocatedDigits(int checkNumber, CheckType checkType)
+        {
+            var removed = false;
+            var digits = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            for (int i = 0; i < 9; i++)
+            {
+                var checkCell = GetCell(checkNumber, i, checkType);
+
+                foreach (var digit in checkCell.MightBe)
+                {
+                    digits[(digit - 1)]++;
+                }
+            }
+            for (int digit = 1; digit < 10; digit++)
+            {
+                if (digits[(digit - 1)] == 1)
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        var setCell = GetCell(checkNumber, i, checkType);
+
+                        if (setCell.MightBe.IndexOf(digit) != -1 && setCell.MightBe.Count > 1)
+                        {
+                            setCell.MightBe = new List<int> { digit };
+                            removed = true;
+                            if (chatty)
+                            {
+                                Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.X + "," + setCell.Y);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return removed;
+        }
+
         static bool CheckForSets()
         {
             var removed = false;
