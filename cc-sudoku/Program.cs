@@ -106,18 +106,8 @@ namespace cc_sudoku
         static void IterateThroughGrid()
         {
             Console.WriteLine("Solving...");
-            var changed = false;
 
-            if (CheckForSets())
-            {
-                changed = true;
-            }
-            if (RuleOutAll())
-            {
-                changed = true;
-            }
-
-            if (changed)
+            if (CheckForSets() || RuleOutAll())
             {
                 if (chatty)
                 {
@@ -133,15 +123,7 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForSets(i, CheckType.Row))
-                {
-                    removed = true;
-                }
-                if (CheckForSets(i, CheckType.Column))
-                {
-                    removed = true;
-                }
-                if (CheckForSets(i, CheckType.Box))
+                if (CheckForSets(i, CheckType.Row) || CheckForSets(i, CheckType.Column) || CheckForSets(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -214,20 +196,7 @@ namespace cc_sudoku
 
         static bool RuleOut(int row, int column)
         {
-            var removed = false;
-            if (RuleOutInType(row, CheckType.Row, grid[row][column].MightBe.First()))
-            {
-                removed = true;
-            }
-            if (RuleOutInType(column, CheckType.Column, grid[row][column].MightBe.First()))
-            {
-                removed = true;
-            }
-            if (RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, grid[row][column].MightBe.First()))
-            {
-                removed = true;
-            }
-            return removed;
+            return RuleOutInType(row, CheckType.Row, grid[row][column].MightBe.First()) || RuleOutInType(column, CheckType.Column, grid[row][column].MightBe.First()) || RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, grid[row][column].MightBe.First()));
         }
 
         static bool RuleOutInType(int checkNum, CheckType checkType, int ruleOut)
