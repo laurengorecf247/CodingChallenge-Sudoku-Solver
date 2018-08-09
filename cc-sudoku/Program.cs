@@ -59,7 +59,7 @@ namespace cc_sudoku
         {
             Console.WriteLine("Solving...");
 
-            if (CheckForSets() || RuleOutAll())
+            if (CheckForLocatedDigits() || CheckForSets() || RuleOutAll())
             {
                 if (chatty)
                 {
