@@ -19,9 +19,26 @@ namespace cc_sudoku
         {
             Console.WriteLine("Solving...");
 
-            if (CheckForLocatedDigits() ||
-                CheckForSets() ||
-                RuleOutAll())
+            var removed = false;
+
+            if (RuleOutAll())
+            {
+                removed = true;
+            }
+            if (CheckForSets())
+            {
+                removed = true;
+            }
+            if (CheckForLocatedDigits())
+            {
+                removed = true;
+            }
+            if (CheckForNearlyLocatedDigits())
+            {
+                removed = true;
+            }
+
+            if (removed)
             {
                 if (chatty)
                 {
@@ -96,6 +113,17 @@ namespace cc_sudoku
                                 Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.X + "," + setCell.Y);
                             }
                             break;
+                        }
+                    }
+                }
+            }
+            return removed;
+        }
+
+                            if (chatty && removed)
+                            {
+                                Console.WriteLine("In box " + (checkNumber + 1) + ", " + (i + 1) + " must be in column " + (globalCol + 1));
+                            }
                         }
                     }
                 }
