@@ -143,7 +143,7 @@ namespace cc_sudoku
                     }
                 }
 
-                if (setsFound.Count == set.Count && set.Count > 1)
+                if (setsFound.Count == set.Count)
                 {
                     for (int k = 0; k < 9; k++)
                     {

@@ -9,7 +9,7 @@ namespace cc_sudoku
 
         static void Main(string[] args)
         {
-            string[] puzzle = File.ReadAllLines(@"C:\testing\sudoku5.csv");
+            string[] puzzle = File.ReadAllLines(@"C:\testing\sudokua1.csv");
             var grid = Utility.InitialiseGrid(puzzle);
             var solver = new Solver(grid, chatty);
 
