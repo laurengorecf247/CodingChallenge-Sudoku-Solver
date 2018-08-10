@@ -19,7 +19,9 @@ namespace cc_sudoku
         {
             Console.WriteLine("Solving...");
 
-            if (CheckForLocatedDigits() || CheckForSets() || RuleOutAll())
+            if (CheckForLocatedDigits() ||
+                CheckForSets() ||
+                RuleOutAll())
             {
                 if (chatty)
                 {
@@ -54,7 +56,9 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForLocatedDigits(i, CheckType.Row) || CheckForLocatedDigits(i, CheckType.Column) || CheckForLocatedDigits(i, CheckType.Box))
+                if (CheckForLocatedDigits(i, CheckType.Row) ||
+                    CheckForLocatedDigits(i, CheckType.Column) ||
+                    CheckForLocatedDigits(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -104,7 +108,9 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForSets(i, CheckType.Row) || CheckForSets(i, CheckType.Column) || CheckForSets(i, CheckType.Box))
+                if (CheckForSets(i, CheckType.Row) ||
+                    CheckForSets(i, CheckType.Column) ||
+                    CheckForSets(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -178,10 +184,11 @@ namespace cc_sudoku
         private bool RuleOutCell(int row, int column)
         {
             var digit = grid[row][column].MightBe.First();
+            var boxNumber = 3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0);
 
             return RuleOutInType(row, CheckType.Row, digit) ||
-                RuleOutInType(column, CheckType.Column, digit) ||
-                RuleOutInType(3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0), CheckType.Box, digit);
+                   RuleOutInType(column, CheckType.Column, digit) ||
+                   RuleOutInType(boxNumber, CheckType.Box, digit);
         }
 
         private bool RuleOutInType(int checkNum, CheckType checkType, int ruleOut)
