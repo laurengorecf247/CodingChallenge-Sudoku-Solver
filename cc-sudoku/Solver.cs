@@ -187,7 +187,7 @@ namespace cc_sudoku
                     }
                 }
 
-                if (subsets.Count == basisSet.Count + 1)
+                if (subsets.Count == basisSet.Count - 1)
                 {
                     for (int k = 0; k < 9; k++)
                     {
