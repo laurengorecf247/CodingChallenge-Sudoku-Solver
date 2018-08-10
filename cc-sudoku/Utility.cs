@@ -29,19 +29,19 @@ namespace cc_sudoku
             return grid;
         }
 
-        public static Cell GetCell(int checkNumber, int i, CheckType checkType, Cell[][] grid)
+        public static Cell GetCell(int objectToCheck, int cellNumberWithinObject, CheckType checkType, Cell[][] grid)
         {
             var cell = new Cell();
             switch (checkType)
             {
                 case CheckType.Row:
-                    cell = grid[checkNumber][i];
+                    cell = grid[objectToCheck][cellNumberWithinObject];
                     break;
                 case CheckType.Column:
-                    cell = grid[i][checkNumber];
+                    cell = grid[cellNumberWithinObject][objectToCheck];
                     break;
                 case CheckType.Box:
-                    cell = grid[3 * (int)Math.Floor(checkNumber / 3.0) + (int)Math.Floor(i / 3.0)][3 * (checkNumber % 3) + i % 3];
+                    cell = grid[3 * (int)Math.Floor(objectToCheck / 3.0) + (int)Math.Floor(cellNumberWithinObject / 3.0)][3 * (objectToCheck % 3) + cellNumberWithinObject % 3];
                     break;
             }
             return cell;
