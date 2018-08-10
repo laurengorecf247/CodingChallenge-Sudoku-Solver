@@ -3,7 +3,7 @@ using System.IO;
 
 namespace cc_sudoku
 {
-    class Program
+    static class Program
     {
         internal const bool chatty = false;
 

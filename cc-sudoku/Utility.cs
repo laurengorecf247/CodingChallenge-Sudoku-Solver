@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace cc_sudoku
 {
-    class Utility
+    static class Utility
     {
         public static Cell[][] InitialiseGrid(string[] puzzle)
         {
