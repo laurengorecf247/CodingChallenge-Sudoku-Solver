@@ -120,44 +120,47 @@ namespace cc_sudoku
 
         private bool CheckForSets(int checkNumber, CheckType checkType)
         {
-            var setsChecked = new List<List<int>>();
             var removed = false;
 
             for (int i = 0; i < 9; i++)
             {
                 var basisCell = Utility.GetCell(checkNumber, i, checkType, grid);
 
-                var set = basisCell.MightBe;
+                var basisSet = basisCell.MightBe;
 
-                if (set.Count == 1)
+                if (basisSet.Count == 1)
                 {
                     continue;
                 }
 
-                setsChecked.Add(set);
-
-                var setsFound = new List<int> { i };
+                var subsets = new List<int> { };
+                var intersects = new List<int> { };
 
                 var chattyRemoved = false;
                 for (int j = 0; j < 9; j++)
                 {
                     var checkCell = Utility.GetCell(checkNumber, j, checkType, grid);
 
-                    if (j != i && set.Intersect(checkCell.MightBe).Count() == checkCell.MightBe.Count)
+                    if (j != i && basisSet.Intersect(checkCell.MightBe).Count() == checkCell.MightBe.Count)
                     {
-                        setsFound.Add(j);
+                        subsets.Add(j);
+                    }
+
+                    else if (j != i && basisSet.Intersect(checkCell.MightBe).Count() > 0)
+                    {
+                        intersects.Add(j);
                     }
                 }
 
-                if (setsFound.Count == set.Count)
+                if (subsets.Count == basisSet.Count + 1)
                 {
                     for (int k = 0; k < 9; k++)
                     {
-                        if (!setsFound.Contains(k))
+                        if (k != i && !subsets.Contains(k))
                         {
                             var removeCell = Utility.GetCell(checkNumber, k, checkType, grid);
 
-                            foreach (var digit in set)
+                            foreach (var digit in basisSet)
                             {
                                 if (removeCell.MightBe.Contains(digit))
                                 {
@@ -172,11 +175,48 @@ namespace cc_sudoku
                             }
                         }
                     }
+                    if (chattyRemoved && chatty)
+                    {
+                        Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", the set " + string.Join(",", basisSet) + " appears " + basisSet.Count + " times");
+                    }
                 }
-                if (chattyRemoved && chatty)
+
+                if (basisSet.Count == 2 && intersects.Count == 2 && checkType == CheckType.Box)
                 {
-                    Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", the set " + string.Join(",", set) + " appears " + set.Count + " times");
+                    var intersect1 = Utility.GetCell(checkNumber, intersects[0], CheckType.Box, grid).MightBe;
+                    var intersect2 = Utility.GetCell(checkNumber, intersects[0], CheckType.Box, grid).MightBe;
+
+                    var union = Enumerable.Union(basisSet, Enumerable.Union(intersect1, intersect2));
+                    if (union.Count() == intersects.Count + 1)
+                    {
+                        for (int k = 0; k < 9; k++)
+                        {
+                            if (k != i && !intersects.Contains(k))
+                            {
+                                var removeCell = Utility.GetCell(checkNumber, k, checkType, grid);
+
+                                foreach (var digit in union)
+                                {
+                                    if (removeCell.MightBe.Contains(digit))
+                                    {
+                                        removeCell.MightBe.Remove(digit);
+                                        if (removeCell.MightBe.Count == 0)
+                                        {
+                                            throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Set check ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                                        }
+                                        chattyRemoved = true;
+                                        removed = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (chattyRemoved && chatty)
+                    {
+                        Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", the set " + string.Join(",", union) + " is covered by 3 cells");
+                    }
                 }
+
             }
             return removed;
         }
