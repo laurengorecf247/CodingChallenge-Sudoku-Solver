@@ -33,6 +33,10 @@ namespace cc_sudoku
             {
                 removed = true;
             }
+            if (CheckForNearlyLocatedDigits())
+            {
+                removed = true;
+            }
 
             if (removed)
             {
@@ -115,6 +119,102 @@ namespace cc_sudoku
                                 Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.Row + "," + setCell.Column);
                             }
                             break;
+                        }
+                    }
+                }
+            }
+            return removed;
+        }
+
+        private bool CheckForNearlyLocatedDigits()
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (CheckForNearlyLocatedDigits(i, CheckType.Box))
+                {
+                    removed = true;
+                }
+            }
+            return removed;
+        }
+
+        private bool CheckForNearlyLocatedDigits(int checkNumber, CheckType checkType)
+        {
+            var removed = false;
+            var digits = new List<List<int>>();
+            for (int i = 0; i < 9; i++)
+            {
+                digits.Add(new List<int>());
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                var checkCell = Utility.GetCell(checkNumber, i, checkType, grid);
+
+                foreach (var digit in checkCell.MightBe)
+                {
+                    digits[digit - 1].Add(i);
+                }
+            }
+            if (checkType == CheckType.Box)
+            {
+                for (var i = 0; i < 9; i++)
+                {
+                    var digit = digits[i];
+                    var digitName = i + 1;
+                    if (digit.Count > 1 && digit.Count <= 3)
+                    {
+                        var firstLocation = digit[0];
+                        var firstRow = (int)Math.Floor(firstLocation / 3.0);
+                        var globalRow = 3 * (int)Math.Floor(checkNumber / 3.0) + firstRow;
+                        var firstCol = firstLocation % 3;
+                        var globalCol = 3 * (checkNumber % 3) + firstCol;
+                        var rowLocated = true;
+                        var colLocated = true;
+                        foreach (var location in digit)
+                        {
+                            var row = (int)Math.Floor(location / 3.0);
+                            if (row != firstRow)
+                            {
+                                rowLocated = false;
+                            }
+                            var col = location % 3;
+                            if (col != firstCol)
+                            {
+                                colLocated = false;
+                            }
+                        }
+                        if (rowLocated)
+                        {
+                            for (int j = 0; j < 9; j++)
+                            {
+                                var removeCell = Utility.GetCell(globalRow, j, CheckType.Row, grid);
+                                var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                                if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
+                                    removeCell.MightBe.Remove(digitName);
+                                    removed = true;
+                                }
+                            }
+                            if (chatty && removed)
+                            {
+                                Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Row " + (globalRow + 1));
+                            }
+                        }
+                        if (colLocated)
+                        {
+                            for (int j = 0; j < 9; j++)
+                            {
+                                var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
+                                var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                                if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
+                                    removeCell.MightBe.Remove(digitName);
+                                    removed = true;
+                                }
+                            }
+                            if (chatty && removed)
+                            {
+                                Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Column " + (globalCol + 1));
+                            }
                         }
                     }
                 }
