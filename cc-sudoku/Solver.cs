@@ -25,7 +25,11 @@ namespace cc_sudoku
             {
                 removed = true;
             }
-            if (CheckForSets())
+            if (CheckForSubsets())
+            {
+                removed = true;
+            }
+            if (CheckForIntersects())
             {
                 removed = true;
             }
@@ -49,7 +53,7 @@ namespace cc_sudoku
             }
         }
 
-        public bool RuleOutAll()
+        private bool RuleOutAll()
         {
             var removed = false;
             for (int i = 0; i < 9; i++)
@@ -222,7 +226,7 @@ namespace cc_sudoku
             return removed;
         }
 
-        private bool CheckForSets()
+        private bool CheckForSubsets()
         {
             var removed = false;
             for (int i = 0; i < 9; i++)
@@ -236,18 +240,6 @@ namespace cc_sudoku
                     removed = true;
                 }
                 if (CheckForSubsets(i, CheckType.Box))
-                {
-                    removed = true;
-                }
-                if (CheckForIntersects(i, CheckType.Row))
-                {
-                    removed = true;
-                }
-                if (CheckForIntersects(i, CheckType.Column))
-                {
-                    removed = true;
-                }
-                if (CheckForIntersects(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -312,6 +304,27 @@ namespace cc_sudoku
                     }
                 }
 
+            }
+            return removed;
+        }
+
+        private bool CheckForIntersects()
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (CheckForIntersects(i, CheckType.Row))
+                {
+                    removed = true;
+                }
+                if (CheckForIntersects(i, CheckType.Column))
+                {
+                    removed = true;
+                }
+                if (CheckForIntersects(i, CheckType.Box))
+                {
+                    removed = true;
+                }
             }
             return removed;
         }
