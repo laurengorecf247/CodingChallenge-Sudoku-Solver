@@ -160,65 +160,62 @@ namespace cc_sudoku
                     digits[digit - 1].Add(i);
                 }
             }
-            if (checkType == CheckType.Box)
+            for (var i = 0; i < 9; i++)
             {
-                for (var i = 0; i < 9; i++)
+                var digit = digits[i];
+                var digitName = i + 1;
+                if (digit.Count > 1 && digit.Count <= 3)
                 {
-                    var digit = digits[i];
-                    var digitName = i + 1;
-                    if (digit.Count > 1 && digit.Count <= 3)
+                    var firstLocation = digit[0];
+                    var firstRow = (int)Math.Floor(firstLocation / 3.0);
+                    var globalRow = 3 * (int)Math.Floor(checkNumber / 3.0) + firstRow;
+                    var firstCol = firstLocation % 3;
+                    var globalCol = 3 * (checkNumber % 3) + firstCol;
+                    var rowLocated = true;
+                    var colLocated = true;
+                    foreach (var location in digit)
                     {
-                        var firstLocation = digit[0];
-                        var firstRow = (int)Math.Floor(firstLocation / 3.0);
-                        var globalRow = 3 * (int)Math.Floor(checkNumber / 3.0) + firstRow;
-                        var firstCol = firstLocation % 3;
-                        var globalCol = 3 * (checkNumber % 3) + firstCol;
-                        var rowLocated = true;
-                        var colLocated = true;
-                        foreach (var location in digit)
+                        var row = (int)Math.Floor(location / 3.0);
+                        if (row != firstRow)
                         {
-                            var row = (int)Math.Floor(location / 3.0);
-                            if (row != firstRow)
-                            {
-                                rowLocated = false;
-                            }
-                            var col = location % 3;
-                            if (col != firstCol)
-                            {
-                                colLocated = false;
+                            rowLocated = false;
+                        }
+                        var col = location % 3;
+                        if (col != firstCol)
+                        {
+                            colLocated = false;
+                        }
+                    }
+                    if (rowLocated)
+                    {
+                        for (int j = 0; j < 9; j++)
+                        {
+                            var removeCell = Utility.GetCell(globalRow, j, CheckType.Row, grid);
+                            var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                            if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
+                                removeCell.MightBe.Remove(digitName);
+                                removed = true;
                             }
                         }
-                        if (rowLocated)
+                        if (chatty && removed)
                         {
-                            for (int j = 0; j < 9; j++)
-                            {
-                                var removeCell = Utility.GetCell(globalRow, j, CheckType.Row, grid);
-                                var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
-                                if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
-                                    removeCell.MightBe.Remove(digitName);
-                                    removed = true;
-                                }
-                            }
-                            if (chatty && removed)
-                            {
-                                Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Row " + (globalRow + 1));
+                            Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Row " + (globalRow + 1));
+                        }
+                    }
+                    if (colLocated)
+                    {
+                        for (int j = 0; j < 9; j++)
+                        {
+                            var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
+                            var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                            if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
+                                removeCell.MightBe.Remove(digitName);
+                                removed = true;
                             }
                         }
-                        if (colLocated)
+                        if (chatty && removed)
                         {
-                            for (int j = 0; j < 9; j++)
-                            {
-                                var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
-                                var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
-                                if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
-                                    removeCell.MightBe.Remove(digitName);
-                                    removed = true;
-                                }
-                            }
-                            if (chatty && removed)
-                            {
-                                Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Column " + (globalCol + 1));
-                            }
+                            Console.WriteLine("In Box " + (checkNumber + 1) + ", " + digitName + " must be in Column " + (globalCol + 1));
                         }
                     }
                 }
