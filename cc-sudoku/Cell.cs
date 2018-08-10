@@ -6,8 +6,8 @@ namespace cc_sudoku
     {
         public List<int> MightBe { get; set; }
 
-        public int X { get; set; }
+        public int Row { get; set; }
 
-        public int Y { get; set; }
+        public int Column { get; set; }
     }
 }

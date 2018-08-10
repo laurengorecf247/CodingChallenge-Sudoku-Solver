@@ -27,7 +27,7 @@ namespace cc_sudoku
                     if (stuckCell.MightBe.Count > 1)
                     {
                         {
-                            Console.WriteLine("Stuck on " + stuckCell.X + "," + stuckCell.Y + " - could be " + string.Join(",", stuckCell.MightBe));
+                            Console.WriteLine("Stuck on " + stuckCell.Row + "," + stuckCell.Column + " - could be " + string.Join(",", stuckCell.MightBe));
                         }
                     }
                 }

@@ -16,8 +16,7 @@ namespace cc_sudoku
             Console.WriteLine("Problem = ");
             Writer.WriteGrid(grid);
             Console.WriteLine();
-
-            solver.RuleOutAll();
+            
             solver.IterateThroughGrid();
 
             Console.WriteLine();

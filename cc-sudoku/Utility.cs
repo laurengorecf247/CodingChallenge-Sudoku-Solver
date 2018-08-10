@@ -16,8 +16,8 @@ namespace cc_sudoku
                 {
                     grid[i][j] = new Cell
                     {
-                        X = i + 1,
-                        Y = j + 1,
+                        Row = i + 1,
+                        Column = j + 1,
                         MightBe = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
                     };
                     if (!string.IsNullOrWhiteSpace(digits[j]))

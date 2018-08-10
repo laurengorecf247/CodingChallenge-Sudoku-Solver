@@ -116,32 +116,9 @@ namespace cc_sudoku
                             removed = true;
                             if (chatty)
                             {
-                                Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.X + "," + setCell.Y);
+                                Console.WriteLine("In " + checkType.ToString() + " " + (checkNumber + 1) + ", " + digit + " can only go in " + setCell.Row + "," + setCell.Column);
                             }
                             break;
-                        }
-                    }
-                }
-            }
-            return removed;
-        }
-
-                        }
-                        if (colLocated)
-                        {
-                            for (int j = 0; j < 9; j++)
-                            {
-                                var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
-                                var boxNum = 3 * (int)Math.Floor((removeCell.X - 1) / 3.0) + (int)Math.Floor(((removeCell.Y - 1.0) % 3.0) / 3.0);
-                                if (boxNum != checkNumber && removeCell.MightBe.Contains(i + 1) && removeCell.MightBe.Count > 1) {
-                                    removeCell.MightBe.Remove(i + 1);
-                                    removed = true;
-                                }
-                            }
-                            if (chatty && removed)
-                            {
-                                Console.WriteLine("In box " + (checkNumber + 1) + ", " + (i + 1) + " must be in column " + (globalCol + 1));
-                            }
                         }
                     }
                 }
@@ -154,15 +131,27 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForSets(i, CheckType.Row))
+                if (CheckForSubsets(i, CheckType.Row))
                 {
                     removed = true;
                 }
-                if (CheckForSets(i, CheckType.Column))
+                if (CheckForSubsets(i, CheckType.Column))
                 {
                     removed = true;
                 }
-                if (CheckForSets(i, CheckType.Box))
+                if (CheckForSubsets(i, CheckType.Box))
+                {
+                    removed = true;
+                }
+                if (CheckForIntersects(i, CheckType.Row))
+                {
+                    removed = true;
+                }
+                if (CheckForIntersects(i, CheckType.Column))
+                {
+                    removed = true;
+                }
+                if (CheckForIntersects(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -170,7 +159,7 @@ namespace cc_sudoku
             return removed;
         }
 
-        private bool CheckForSets(int checkNumber, CheckType checkType)
+        private bool CheckForSubsets(int checkNumber, CheckType checkType)
         {
             var removed = false;
 
@@ -186,7 +175,6 @@ namespace cc_sudoku
                 }
 
                 var subsets = new List<int> { };
-                var intersects = new List<int> { };
 
                 var chattyRemoved = false;
                 for (int j = 0; j < 9; j++)
@@ -196,11 +184,6 @@ namespace cc_sudoku
                     if (j != i && basisSet.Intersect(checkCell.MightBe).Count() == checkCell.MightBe.Count)
                     {
                         subsets.Add(j);
-                    }
-
-                    else if (j != i && basisSet.Intersect(checkCell.MightBe).Count() > 0)
-                    {
-                        intersects.Add(j);
                     }
                 }
 
@@ -219,7 +202,7 @@ namespace cc_sudoku
                                     removeCell.MightBe.Remove(digit);
                                     if (removeCell.MightBe.Count == 0)
                                     {
-                                        throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Set check ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                                        throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Subset check ruled out all options for " + removeCell.Row + "," + removeCell.Column);
                                     }
                                     chattyRemoved = true;
                                     removed = true;
@@ -233,10 +216,42 @@ namespace cc_sudoku
                     }
                 }
 
+            }
+            return removed;
+        }
+
+        private bool CheckForIntersects(int checkNumber, CheckType checkType)
+        {
+            var removed = false;
+
+            for (int i = 0; i < 9; i++)
+            {
+                var basisCell = Utility.GetCell(checkNumber, i, checkType, grid);
+
+                var basisSet = basisCell.MightBe;
+
+                if (basisSet.Count == 1)
+                {
+                    continue;
+                }
+                
+                var intersects = new List<int> { };
+
+                var chattyRemoved = false;
+                for (int j = 0; j < 9; j++)
+                {
+                    var checkCell = Utility.GetCell(checkNumber, j, checkType, grid);
+
+                    if (j != i && basisSet.Intersect(checkCell.MightBe).Count() < checkCell.MightBe.Count && basisSet.Intersect(checkCell.MightBe).Count() > 0)
+                    {
+                        intersects.Add(j);
+                    }
+                }
+
                 if (basisSet.Count == 2 && intersects.Count == 2 && checkType == CheckType.Box)
                 {
                     var intersect1 = Utility.GetCell(checkNumber, intersects[0], CheckType.Box, grid).MightBe;
-                    var intersect2 = Utility.GetCell(checkNumber, intersects[0], CheckType.Box, grid).MightBe;
+                    var intersect2 = Utility.GetCell(checkNumber, intersects[1], CheckType.Box, grid).MightBe;
 
                     var union = Enumerable.Union(basisSet, Enumerable.Union(intersect1, intersect2));
                     if (union.Count() == intersects.Count + 1)
@@ -254,7 +269,7 @@ namespace cc_sudoku
                                         removeCell.MightBe.Remove(digit);
                                         if (removeCell.MightBe.Count == 0)
                                         {
-                                            throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Set check ruled out all options for " + removeCell.X + "," + removeCell.Y);
+                                            throw new Exception(checkType.ToString() + " " + (checkNumber + 1) + ": Intersect check ruled out all options for " + removeCell.Row + "," + removeCell.Column);
                                         }
                                         chattyRemoved = true;
                                         removed = true;
