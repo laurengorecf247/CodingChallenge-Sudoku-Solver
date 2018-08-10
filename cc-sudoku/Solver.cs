@@ -73,9 +73,15 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForLocatedDigits(i, CheckType.Row) ||
-                    CheckForLocatedDigits(i, CheckType.Column) ||
-                    CheckForLocatedDigits(i, CheckType.Box))
+                if (CheckForLocatedDigits(i, CheckType.Row))
+                {
+                    removed = true;
+                }
+                if (CheckForLocatedDigits(i, CheckType.Column))
+                {
+                    removed = true;
+                }
+                if (CheckForLocatedDigits(i, CheckType.Box))
                 {
                     removed = true;
                 }
@@ -120,6 +126,18 @@ namespace cc_sudoku
             return removed;
         }
 
+                        }
+                        if (colLocated)
+                        {
+                            for (int j = 0; j < 9; j++)
+                            {
+                                var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
+                                var boxNum = 3 * (int)Math.Floor((removeCell.X - 1) / 3.0) + (int)Math.Floor(((removeCell.Y - 1.0) % 3.0) / 3.0);
+                                if (boxNum != checkNumber && removeCell.MightBe.Contains(i + 1) && removeCell.MightBe.Count > 1) {
+                                    removeCell.MightBe.Remove(i + 1);
+                                    removed = true;
+                                }
+                            }
                             if (chatty && removed)
                             {
                                 Console.WriteLine("In box " + (checkNumber + 1) + ", " + (i + 1) + " must be in column " + (globalCol + 1));
@@ -136,9 +154,15 @@ namespace cc_sudoku
             var removed = false;
             for (int i = 0; i < 9; i++)
             {
-                if (CheckForSets(i, CheckType.Row) ||
-                    CheckForSets(i, CheckType.Column) ||
-                    CheckForSets(i, CheckType.Box))
+                if (CheckForSets(i, CheckType.Row))
+                {
+                    removed = true;
+                }
+                if (CheckForSets(i, CheckType.Column))
+                {
+                    removed = true;
+                }
+                if (CheckForSets(i, CheckType.Box))
                 {
                     removed = true;
                 }
