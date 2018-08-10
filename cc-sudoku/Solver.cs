@@ -278,9 +278,21 @@ namespace cc_sudoku
             var digit = grid[row][column].MightBe.First();
             var boxNumber = 3 * (int)Math.Floor(row / 3.0) + (int)Math.Floor(column / 3.0);
 
-            return RuleOutInType(row, CheckType.Row, digit) ||
-                   RuleOutInType(column, CheckType.Column, digit) ||
-                   RuleOutInType(boxNumber, CheckType.Box, digit);
+            var removed = false;
+            if (RuleOutInType(row, CheckType.Row, digit))
+            {
+                removed = true;
+            }
+            if (RuleOutInType(column, CheckType.Column, digit))
+            {
+                removed = true;
+            }
+            if (RuleOutInType(boxNumber, CheckType.Box, digit))
+            {
+                removed = true;
+            }
+
+            return removed;
         }
 
         private bool RuleOutInType(int checkNum, CheckType checkType, int ruleOut)
