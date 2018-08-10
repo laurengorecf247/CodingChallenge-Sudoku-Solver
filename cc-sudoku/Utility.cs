@@ -11,7 +11,7 @@ namespace cc_sudoku
             for (int i = 0; i < 9; i++)
             {
                 grid[i] = new Cell[9];
-                var digits = puzzle[i].Split(",");
+                var digits = puzzle[i].Split(',');
                 for (int j = 0; j < 9; j++)
                 {
                     grid[i][j] = new Cell
