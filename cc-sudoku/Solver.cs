@@ -33,10 +33,6 @@ namespace cc_sudoku
             {
                 removed = true;
             }
-            if (CheckForNearlyLocatedDigits())
-            {
-                removed = true;
-            }
 
             if (removed)
             {
