@@ -29,6 +29,11 @@ namespace cc_sudoku
             return grid;
         }
 
+        public static int GetBoxNum(Cell cell)
+        {
+            return 3 * (int)Math.Floor((cell.Row - 1) / 3.0) + (int)Math.Floor((cell.Column - 1.0) / 3.0);
+        }
+
         public static Cell GetCell(int objectToCheck, int cellNumberWithinObject, CheckType checkType, Cell[][] grid)
         {
             var row = 0;

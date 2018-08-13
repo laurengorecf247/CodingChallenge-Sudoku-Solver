@@ -191,7 +191,7 @@ namespace cc_sudoku
                         for (int j = 0; j < 9; j++)
                         {
                             var removeCell = Utility.GetCell(globalRow, j, CheckType.Row, grid);
-                            var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                            var boxNum = Utility.GetBoxNum(removeCell);
                             if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
                                 removeCell.MightBe.Remove(digitName);
                                 removed = true;
@@ -207,7 +207,7 @@ namespace cc_sudoku
                         for (int j = 0; j < 9; j++)
                         {
                             var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
-                            var boxNum = 3 * (int)Math.Floor((removeCell.Row - 1) / 3.0) + (int)Math.Floor((removeCell.Column - 1.0) / 3.0);
+                            var boxNum = Utility.GetBoxNum(removeCell);
                             if (boxNum != checkNumber && removeCell.MightBe.Contains(digitName) && removeCell.MightBe.Count > 1) {
                                 removeCell.MightBe.Remove(digitName);
                                 removed = true;
