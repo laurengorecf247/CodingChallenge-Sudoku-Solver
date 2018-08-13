@@ -29,6 +29,40 @@ namespace cc_sudoku
             return grid;
         }
 
+        public static bool CheckAllBox(Func<int, CheckType, bool> checkFunction)
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (checkFunction(i, CheckType.Box))
+                {
+                    removed = true;
+                }
+            }
+            return removed;
+        }
+
+        public static bool CheckAllRowColumnBox(Func<int, CheckType, bool> checkFunction)
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (checkFunction(i, CheckType.Row))
+                {
+                    removed = true;
+                }
+                if (checkFunction(i, CheckType.Column))
+                {
+                    removed = true;
+                }
+                if (checkFunction(i, CheckType.Box))
+                {
+                    removed = true;
+                }
+            }
+            return removed;
+        }
+
         public static int GetBoxNum(Cell cell)
         {
             return 3 * (int)Math.Floor((cell.Row - 1) / 3.0) + (int)Math.Floor((cell.Column - 1.0) / 3.0);

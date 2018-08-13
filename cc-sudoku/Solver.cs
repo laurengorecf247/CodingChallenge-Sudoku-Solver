@@ -25,19 +25,19 @@ namespace cc_sudoku
             {
                 removed = true;
             }
-            if (CheckForSubsets())
+            if (Utility.CheckAllRowColumnBox(CheckForSubsets))
             {
                 removed = true;
             }
-            if (CheckForIntersects())
+            if (Utility.CheckAllRowColumnBox(CheckForIntersects))
             {
                 removed = true;
             }
-            if (CheckForLocatedDigits())
+            if (Utility.CheckAllRowColumnBox(CheckForLocatedDigits))
             {
                 removed = true;
             }
-            if (CheckForNearlyLocatedDigits())
+            if (Utility.CheckAllBox(CheckForNearlyLocatedDigits))
             {
                 removed = true;
             }
@@ -67,27 +67,6 @@ namespace cc_sudoku
                             removed = true;
                         }
                     }
-                }
-            }
-            return removed;
-        }
-
-        private bool CheckForLocatedDigits()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                if (CheckForLocatedDigits(i, CheckType.Row))
-                {
-                    removed = true;
-                }
-                if (CheckForLocatedDigits(i, CheckType.Column))
-                {
-                    removed = true;
-                }
-                if (CheckForLocatedDigits(i, CheckType.Box))
-                {
-                    removed = true;
                 }
             }
             return removed;
@@ -125,19 +104,6 @@ namespace cc_sudoku
                             break;
                         }
                     }
-                }
-            }
-            return removed;
-        }
-
-        private bool CheckForNearlyLocatedDigits()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                if (CheckForNearlyLocatedDigits(i, CheckType.Box))
-                {
-                    removed = true;
                 }
             }
             return removed;
@@ -223,27 +189,6 @@ namespace cc_sudoku
             return removed;
         }
 
-        private bool CheckForSubsets()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                if (CheckForSubsets(i, CheckType.Row))
-                {
-                    removed = true;
-                }
-                if (CheckForSubsets(i, CheckType.Column))
-                {
-                    removed = true;
-                }
-                if (CheckForSubsets(i, CheckType.Box))
-                {
-                    removed = true;
-                }
-            }
-            return removed;
-        }
-
         private bool CheckForSubsets(int checkNumber, CheckType checkType)
         {
             var removed = false;
@@ -301,27 +246,6 @@ namespace cc_sudoku
                     }
                 }
 
-            }
-            return removed;
-        }
-
-        private bool CheckForIntersects()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                if (CheckForIntersects(i, CheckType.Row))
-                {
-                    removed = true;
-                }
-                if (CheckForIntersects(i, CheckType.Column))
-                {
-                    removed = true;
-                }
-                if (CheckForIntersects(i, CheckType.Box))
-                {
-                    removed = true;
-                }
             }
             return removed;
         }
