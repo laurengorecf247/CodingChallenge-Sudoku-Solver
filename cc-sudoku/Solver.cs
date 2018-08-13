@@ -53,25 +53,6 @@ namespace cc_sudoku
             }
         }
 
-        private bool RuleOutAll()
-        {
-            var removed = false;
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (grid[i][j].MightBe.Count == 1)
-                    {
-                        if (RuleOutCell(i, j))
-                        {
-                            removed = true;
-                        }
-                    }
-                }
-            }
-            return removed;
-        }
-
         private bool CheckForLocatedDigits(int checkNumber, CheckType checkType)
         {
             var removed = false;
@@ -314,6 +295,25 @@ namespace cc_sudoku
                     }
                 }
 
+            }
+            return removed;
+        }
+
+        private bool RuleOutAll()
+        {
+            var removed = false;
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (grid[i][j].MightBe.Count == 1)
+                    {
+                        if (RuleOutCell(i, j))
+                        {
+                            removed = true;
+                        }
+                    }
+                }
             }
             return removed;
         }
