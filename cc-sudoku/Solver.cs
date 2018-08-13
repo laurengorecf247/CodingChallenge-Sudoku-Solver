@@ -168,9 +168,7 @@ namespace cc_sudoku
                 {
                     var firstLocation = digit[0];
                     var firstRow = (int)Math.Floor(firstLocation / 3.0);
-                    var globalRow = 3 * (int)Math.Floor(checkNumber / 3.0) + firstRow;
                     var firstCol = firstLocation % 3;
-                    var globalCol = 3 * (checkNumber % 3) + firstCol;
                     var rowLocated = true;
                     var colLocated = true;
                     foreach (var location in digit)
@@ -188,6 +186,7 @@ namespace cc_sudoku
                     }
                     if (rowLocated)
                     {
+                        var globalRow = 3 * (int)Math.Floor(checkNumber / 3.0) + firstRow;
                         for (int j = 0; j < 9; j++)
                         {
                             var removeCell = Utility.GetCell(globalRow, j, CheckType.Row, grid);
@@ -204,6 +203,7 @@ namespace cc_sudoku
                     }
                     if (colLocated)
                     {
+                        var globalCol = 3 * (checkNumber % 3) + firstCol;
                         for (int j = 0; j < 9; j++)
                         {
                             var removeCell = Utility.GetCell(globalCol, j, CheckType.Column, grid);
